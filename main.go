@@ -1,11 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"github.com/tteeoo/svc/mem"
+	"github.com/tteeoo/svc/cpu"
 )
 
 func main() {
-	var m mem.MemoryDevice = mem.NewGenericMemoryDevice()
-	fmt.Println(m.GetTextBuffer())
+	c := cpu.NewGenericCPU()
+	c.Op(0x00, []uint16{})
 }
