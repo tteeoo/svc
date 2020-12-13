@@ -8,11 +8,11 @@ import (
 func main() {
 	c := cpu.NewGenericCPU()
 	c.Op(c.GetOp("nop"), []uint16{})
-	c.Op(c.GetOp("cpl"), []uint16{0xff, 0})
-	c.Op(c.GetOp("cop"), []uint16{0, 1})
-	c.Op(c.GetOp("str"), []uint16{1, 2, 2})
-	c.Op(c.GetOp("ldr"), []uint16{2, 2, 3})
-	c.Op(c.GetOp("cpl"), []uint16{0x41, 6})
-	c.Op(c.GetOp("str"), []uint16{2, 3, 6})
-	fmt.Println(c.GetMemoryDevice().GetAddressSpace(0))
+	c.Op(c.GetOp("cpl"), []uint16{0, 0xff})
+	c.Op(c.GetOp("cop"), []uint16{1, 0})
+	c.Op(c.GetOp("str"), []uint16{2, 1})
+	c.Op(c.GetOp("ldr"), []uint16{3, 2})
+	c.Op(c.GetOp("cpl"), []uint16{6, 0x41})
+	c.Op(c.GetOp("str"), []uint16{3, 6})
+	fmt.Println(c.GetMemoryDevice())
 }
