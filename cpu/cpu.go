@@ -7,6 +7,7 @@ import (
 
 // CPU is an interface that wraps methods to interact with a basic CPU.
 type CPU interface {
-	Op(uint16, []uint16)
+	GetOp(string) uint16
+	Op(uint16, []uint16) error
 	GetMemoryDevice() mem.MemoryDevice
 }
