@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"encoding/binary"
 	"encoding/hex"
+	"fmt"
 	"github.com/tteeoo/svc/cpu"
 	"strconv"
 	"strings"
@@ -96,9 +96,9 @@ func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
 					op[i+1] = binary.BigEndian.Uint16(b)
 					// Handle address
 				} else if (len(j) > 2) && (j[0] == '[') && (j[len(j)-1] == ']') {
-					variable, exists := vars[j[1 : len(j)-1]]
+					variable, exists := vars[j[1:len(j)-1]]
 					if !exists {
-						return nil, nil, fmt.Errorf("address %s not declared", j[1 : len(j)-1])
+						return nil, nil, fmt.Errorf("address %s not declared", j[1:len(j)-1])
 					}
 					op[i+1] = variable
 					// Handle int TODO: negatives
