@@ -1,9 +1,5 @@
 package mem
 
-import (
-	"fmt"
-)
-
 // GenericMemoryDevice is a basic implementation of a MemoryDevice.
 // It has one 80x25 text-mode display buffer.
 // It can have multiple "memory banks" which allow it to store more than just 64K.
@@ -23,20 +19,12 @@ func (m *GenericMemoryDevice) GetTextBuffer() *TextBuffer {
 }
 
 // GetAddressSpace returns a pointer the address space of the specified bank.
-// It returns an error if the address space does not exist.
-func (m *GenericMemoryDevice) GetAddressSpace(key uint16) (*AddressSpace, error) {
+// It creates a new address space if bank does not exist.
+func (m *GenericMemoryDevice) GetAddressSpace(key uint16) *AddressSpace {
 	value, exists := m.banks[key]
 	if !exists {
-		return nil, fmt.Errorf("address space %x does not exist", key)
+		value = &AddressSpace{}
+		m.banks[key] = value
 	}
-	return value, nil
-}
-
-// NewAddressSpace creates a new memory bank and returns its address and
-// a pointer to its address space.
-func (m *GenericMemoryDevice) NewAddressSpace() (uint16, *AddressSpace) {
-	key := uint16(len(m.banks))
-	as := &AddressSpace{}
-	m.banks[key] = as
-	return key, as
+	return value
 }

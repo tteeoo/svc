@@ -12,6 +12,5 @@ type TextBuffer [25][80]uint16
 // random-access memory device.
 type MemoryDevice interface {
 	GetTextBuffer() *TextBuffer
-	GetAddressSpace(uint16) (*AddressSpace, error)
-	NewAddressSpace() (uint16, *AddressSpace)
+	GetAddressSpace(uint16) *AddressSpace
 }
