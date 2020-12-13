@@ -1,30 +1,26 @@
 package mem
 
 // GenericMemoryDevice is a basic implementation of a MemoryDevice.
-// It has one 80x25 text-mode display buffer.
-// It can have multiple "memory banks" which allow it to store more than just 64K.
 type GenericMemoryDevice struct {
-	tb    TextBuffer
-	banks map[uint16]*AddressSpace
+	mem addressSpace
 }
 
 // NewGenericMemoryDevice returns a pointer to a newly initialized GenericMemoryDevice.
 func NewGenericMemoryDevice() *GenericMemoryDevice {
-	return &GenericMemoryDevice{tb: TextBuffer{}, banks: make(map[uint16]*AddressSpace)}
+	return &GenericMemoryDevice{mem: addressSpace{}}
 }
 
-// GetTextBuffer returns a pointer to the device's text buffer.
-func (m *GenericMemoryDevice) GetTextBuffer() *TextBuffer {
-	return &m.tb
-}
-
-// GetAddressSpace returns a pointer the address space of the specified bank.
-// It creates a new address space if bank does not exist.
-func (m *GenericMemoryDevice) GetAddressSpace(key uint16) *AddressSpace {
-	value, exists := m.banks[key]
+// Get gets the value stored at a specified address.
+func (m *GenericMemoryDevice) Get(address uint16) uint16 {
+	value, exists := m.mem[address]
 	if !exists {
-		value = &AddressSpace{}
-		m.banks[key] = value
+		m.mem[address] = 0x00
+		value = 0x00
 	}
 	return value
+}
+
+// Set sets the specified address to the specified value.
+func (m *GenericMemoryDevice) Set(address uint16, value uint16) {
+	m.mem[address] = value
 }
