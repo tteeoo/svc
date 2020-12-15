@@ -29,5 +29,5 @@ func (r *Register) Set(value uint16) {
 
 // String returns a string representation of the Register.
 func (r *Register) String() string {
-	return fmt.Sprintf("<%d:%x>", r.Num, r.State)
+	return fmt.Sprintf("%d:%x", r.Num, r.State)
 }

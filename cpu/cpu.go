@@ -7,31 +7,47 @@ import (
 	"github.com/tteeoo/svc/mem"
 )
 
+const (
+	GPRNum = 8
+	PCNum = iota
+	ACNum
+	SPNum
+)
+
 // CPU is a basic implementation of a CPU.
 type CPU struct {
-	// mem is the memory device used by the CPU.
+	// Mem is the main memory device used by the CPU.
 	Mem *mem.RAM
-	// regs maps numbers to regsiters.
+	// Regs maps numbers to regsiters.
 	Regs map[uint16]*Register
-	// ops maps opcode names to opcodes.
-	Ops map[string]uint16
+	// RegNames maps register names to numbers.
+	RegNames map[string]uint16
+	// OpNames maps opcode names to opcodes.
+	OpNames map[string]uint16
 }
 
 // NewCPU returns a pointer to a newly initialized CPU.
 func NewCPU() *CPU {
 	regs := make(map[uint16]*Register)
 	// General purpose registers
-	for _, i := range []uint16{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07} {
+	for _, i := range []uint16{0, 1, 2, 3, 4, 5, 6, 7} {
 		regs[i] = NewRegister(i)
 	}
 	// Program counter
-	regs[0x08] = NewRegister(0x08)
+	regs[GPRNum+PCNum] = NewRegister(GPRNum+PCNum)
 	// Accumulator
-	regs[0x09] = NewRegister(0x09)
+	regs[GPRNum+ACNum] = NewRegister(GPRNum+ACNum)
+	// Stack pointer
+	regs[GPRNum+SPNum] = NewRegister(GPRNum+SPNum)
 	return &CPU{
 		Mem:  mem.NewRAM(),
 		Regs: regs,
-		Ops: map[string]uint16{
+		RegNames: map[string]uint16{
+			"pc": GPRNum+PCNum,
+			"ac": GPRNum+ACNum,
+			"sp": GPRNum+SPNum,
+		},
+		OpNames: map[string]uint16{
 			"nop": 0x00,
 			"cop": 0x01,
 			"cpl": 0x02,
@@ -49,7 +65,7 @@ func (c *CPU) GetMem() *mem.RAM {
 // GetOp returns to opcode whose name is provided.
 // Returns 0x00 (nop) if the name is not defined.
 func (c *CPU) GetOp(name string) uint16 {
-	opcode, exists := c.Ops[name]
+	opcode, exists := c.OpNames[name]
 	if !exists {
 		opcode = 0x00
 	}

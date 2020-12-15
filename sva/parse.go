@@ -11,15 +11,19 @@ import (
 
 // parse parses an input file into memory and opcodes.
 func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
+
 	var ops [][]uint16
+	var address uint16 = 0x00
 	mem := make(map[uint16]uint16)
 	vars := make(map[string]uint16)
-	var address uint16 = 0x00
+
 	// CPU for translating opcodes
-	var c cpu.CPU = cpu.NewGenericCPU()
+	c := cpu.NewCPU()
+
 	// Iterate lines
 	split := strings.Split(string(b), "\n")
 	for _, line := range split {
+
 		// Parse out comments
 		noComments := ""
 		for _, char := range line {
@@ -28,8 +32,10 @@ func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
 			}
 			noComments += string(char)
 		}
+
 		// Tokenize
 		badSplitLine := strings.Split(strings.Replace(noComments, "\t", "", -1), " ")
+
 		// Remove empty strings
 		var splitLine []string
 		for _, str := range badSplitLine {
@@ -37,9 +43,11 @@ func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
 				splitLine = append(splitLine, str)
 			}
 		}
+
 		// Handle mem
 		if (len(splitLine) == 3) && (splitLine[1] == "=") {
 			if len(splitLine[2]) > 2 {
+
 				// Handle a string
 				if (splitLine[2][0] == byte('"')) && (splitLine[2][len(splitLine[2])-1] == byte('"')) {
 					vars[splitLine[0]] = address
@@ -48,8 +56,9 @@ func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
 						address++
 					}
 					continue
-					// Handle a hex value
+
 				} else if splitLine[2][1] == 'x' {
+					// Handle a hex value
 					val := splitLine[2][2:]
 					if len(val) == 2 {
 						val = "00" + val
@@ -64,6 +73,7 @@ func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
 					continue
 				}
 			}
+
 			// Handle an int
 			i, err := strconv.Atoi(splitLine[2])
 			if err != nil {
@@ -72,19 +82,15 @@ func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
 			vars[splitLine[0]] = address
 			mem[address] = uint16(i)
 			address++
-			// Handle instruction
+
 		} else if len(splitLine) > 0 {
+			// Handle instruction
 			op := make([]uint16, len(splitLine))
 			op[0] = c.GetOp(splitLine[0])
+
 			for i, j := range splitLine[1:] {
-				// Alias for isp register
-				if j == "isp" {
-					op[i+1] = 0x08
-					// Alias for acc register
-				} else if j == "acc" {
-					op[i+1] = 0x09
+				if (len(j) > 2) && (j[1] == 'x') {
 					// Handle hex number
-				} else if (len(j) > 2) && (j[1] == 'x') {
 					val := j[2:]
 					if len(val) == 2 {
 						val = "00" + val
@@ -94,15 +100,21 @@ func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
 						return nil, nil, err
 					}
 					op[i+1] = binary.BigEndian.Uint16(b)
-					// Handle address
+
 				} else if (len(j) > 2) && (j[0] == '[') && (j[len(j)-1] == ']') {
+					// Handle address
 					variable, exists := vars[j[1:len(j)-1]]
 					if !exists {
 						return nil, nil, fmt.Errorf("address %s not declared", j[1:len(j)-1])
 					}
 					op[i+1] = variable
-					// Handle int TODO: negatives
+
+				} else if num, exists := c.RegNames[j]; exists {
+					// Handle register alias
+					op[i+1] = num
+
 				} else if len(j) > 0 {
+					// Handle int TODO: negatives
 					n, err := strconv.Atoi(j)
 					if err != nil {
 						return nil, nil, err
@@ -110,8 +122,10 @@ func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
 					op[i+1] = uint16(n)
 				}
 			}
+
 			ops = append(ops, op)
 		}
 	}
+
 	return mem, ops, nil
 }
