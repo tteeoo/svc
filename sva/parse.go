@@ -114,12 +114,21 @@ func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
 					op[i+1] = num
 
 				} else if len(j) > 0 {
-					// Handle int TODO: negatives
-					n, err := strconv.Atoi(j)
-					if err != nil {
-						return nil, nil, err
+					// Negative number
+					if j[0] == '-' && len(j) > 1 {
+						n, err := strconv.Atoi(j[1:])
+						if err != nil {
+							return nil, nil, err
+						}
+						op[i+1] = ^uint16(n)+1
+					} else {
+						// Positive number
+						n, err := strconv.Atoi(j)
+						if err != nil {
+							return nil, nil, err
+						}
+						op[i+1] = uint16(n)
 					}
-					op[i+1] = uint16(n)
 				}
 			}
 
