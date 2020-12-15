@@ -30,15 +30,15 @@ type CPU struct {
 func NewCPU() *CPU {
 	regs := make(map[uint16]*Register)
 	// General purpose registers
-	for _, i := range []uint16{0, 1, 2, 3, 4, 5, 6, 7} {
-		regs[i] = NewRegister(i)
+	for i := range [GPRNum]uint16{} {
+		regs[uint16(i)] = NewRegister()
 	}
 	// Program counter
-	regs[GPRNum+PCNum] = NewRegister(GPRNum+PCNum)
+	regs[GPRNum+PCNum] = NewRegister()
 	// Accumulator
-	regs[GPRNum+ACNum] = NewRegister(GPRNum+ACNum)
+	regs[GPRNum+ACNum] = NewRegister()
 	// Stack pointer
-	regs[GPRNum+SPNum] = NewRegister(GPRNum+SPNum)
+	regs[GPRNum+SPNum] = NewRegister()
 	return &CPU{
 		Mem:  mem.NewRAM(),
 		Regs: regs,
@@ -74,7 +74,8 @@ func (c *CPU) GetOp(name string) uint16 {
 
 // Op executes an opcode with the given operands.
 func (c *CPU) Op(opcode uint16, operands []uint16) error {
-	fmt.Println(opcode, operands, c.Regs)
+	fmt.Println("-->", opcode, operands)
+	fmt.Println(c)
 	switch opcode {
 	// nop
 	case 0x00:
@@ -101,4 +102,18 @@ func (c *CPU) Op(opcode uint16, operands []uint16) error {
 		)
 	}
 	return nil
+}
+
+// String returns a string representation of a CPU.
+func (c *CPU) String() string {
+	out := "Registers:"
+	for i := range [GPRNum]uint16{} {
+		out += fmt.Sprintf("\n%d:%s", i, c.Regs[uint16(i)])
+	}
+	out += fmt.Sprintf("\npc:%s", c.Regs[GPRNum+PCNum])
+	out += fmt.Sprintf("\nac:%s", c.Regs[GPRNum+ACNum])
+	out += fmt.Sprintf("\nsp:%s", c.Regs[GPRNum+SPNum])
+	out += "\nMemory:\n"
+	out += c.Mem.String()
+	return out
 }
