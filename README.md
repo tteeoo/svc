@@ -6,6 +6,11 @@ It uses word-based memory, where each memory address maps to a word-length value
 This means that while there are only 65,536 memory addresses,
 it technically has 128K of memory since each address points to a 16-bit value instead of a byte.
 
+It has a VGA text-mode where it starts reading the contents of memory from a specified address
+(using a specified resolution, 80x25 by default),
+translates the encoded colors into ANSI escape codes,
+and prints the output to your terminal.
+
 This repository contains the virtual machine and an assembler to compile programs for it.
 
 ## The Simple Virtual Assembler (sva)
