@@ -135,20 +135,30 @@ func (v *VGA) TextDraw() {
 	current := strings.Split(out, "\n")
 	if len(v.LastBuffer) != len(current) {
 		print("\033[2J\033[H" + out)
+		v.LastBuffer = current
 		return
 	}
 	realOut := "\033[H"
 	diffLines := []int{}
-	for i := 0; i < len(current); i++ {
-		if current[i] != v.LastBuffer[i] {
-			diffLines = append(diffLines, i)
+	for i, j := range current {
+		for k := range j {
+			if current[i][k] != v.LastBuffer[i][k] {
+				diffLines = append(diffLines, i)
+				break
+			}
 		}
 	}
+	v.LastBuffer = current
 	line := 0
 	for _, i := range diffLines {
-		realOut += fmt.Sprintf("\033[%dB", (i - line))
-		realOut += current[i] + "\n"
-		line = i
+		cursor := (i - line)
+		if cursor > 0 {
+			realOut += fmt.Sprintf("\033[%dB", cursor)
+		} else if cursor < 0 {
+			realOut += fmt.Sprintf("\033[%dA", -cursor)
+		}
+		realOut += "\033[2K" + current[i] + "\n\033[0m"
+		line = i + 1
 	}
-	print(realOut)
+	print(realOut + fmt.Sprintf("\033[%dB", v.TextHeight-line))
 }
