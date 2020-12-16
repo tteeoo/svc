@@ -160,5 +160,9 @@ func (v *VGA) TextDraw() {
 		realOut += "\033[2K" + current[i] + "\n\033[0m"
 		line = i + 1
 	}
-	print(realOut + fmt.Sprintf("\033[%dB", v.TextHeight-line))
+	final := ""
+	if v.TextHeight - line > 0 {
+		final = fmt.Sprintf("\033[%dB", v.TextHeight-line)
+	}
+	print(realOut + final)
 }
