@@ -2,8 +2,8 @@
 package vga
 
 import (
-	"github.com/tteeoo/svc/mem"
 	"fmt"
+	"github.com/tteeoo/svc/mem"
 	"strings"
 )
 
@@ -132,7 +132,7 @@ func (v *VGA) TextDraw() {
 	}
 	current := strings.Split(out, "\n")
 	if len(v.LastBuffer) != len(current) {
-		print("\033[2J\033[H"+out)
+		print("\033[2J\033[H" + out)
 		return
 	}
 	realOut := "\033[H"
