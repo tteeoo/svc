@@ -47,14 +47,11 @@ Documentation for the assembly language will be made soon (see "To Do").
 ## To Do
 
 * A package for parsing and creating svb files.
-* Instructions for sub-routines.
-* Instructions for branching.
-* A clock package.
-* The ability to run svb files directly.
+* CPU instructions for sub-routines and branching.
+* The ability to load and execute svb files directly.
 * Example programs and documentation.
 * Some sort of debugging mode.
-* Frame buffer/graphics mode.
 
 ## License
 
-The contents of the repository are made available under the Unlicense, a public domain equivalent license.
+The contents of this repository are made available under the Unlicense, a public domain equivalent license.
