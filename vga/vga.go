@@ -40,13 +40,15 @@ func (v *VGA) TextDraw() {
 		tb[i] = make([][2]byte, v.TextWidth)
 	}
 	// Populate
+	a := uint16(0)
 	for i := 0; i < v.TextHeight; i++ {
 		for j := 0; j < v.TextWidth; j++ {
-			b := v.Mem.Get(uint16((v.TextHeight * i) + j))
+			b := v.Mem.Get(a)
 			tb[i][j] = [2]byte{
 				byte(b >> 8),
 				byte((b << 8) >> 8),
 			}
+			a++
 		}
 	}
 	// Print
