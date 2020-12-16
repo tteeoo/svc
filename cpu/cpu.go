@@ -74,6 +74,10 @@ func NewCPU() *CPU {
 			"xor": 0x0d,
 			"and": 0x0e,
 			"orr": 0x0f,
+			"not": 0x10,
+			"shr": 0x11,
+			"shl": 0x12,
+			"vga": 0x13,
 		},
 	}
 }
@@ -192,6 +196,31 @@ func (c *CPU) Op(opcode uint16, operands []uint16) error {
 		c.Regs[c.RegNames["ac"]].Set(
 			c.Regs[c.RegNames["ac"]].Get() | c.Regs[operands[0]].Get(),
 		)
+	// not (reg to invert)
+	case 0x10:
+		c.Regs[operands[0]].Set(
+			^c.Regs[operands[0]].Get(),
+		)
+	// shr (reg to shift, amount to shift)
+	case 0x11:
+		c.Regs[operands[0]].Set(
+			c.Regs[operands[0]].Get() >> operands[1],
+		)
+	// shl (reg to shift, amount to shift)
+	case 0x12:
+		c.Regs[operands[0]].Set(
+			c.Regs[operands[0]].Get() << operands[1],
+		)
+	// vga
+	case 0x13:
+		c.VGA.TextDraw()
+		// TODO:
+		// psh
+		// pop
+		// jmp
+		// cmp
+		// jme
+		// jne
 	}
 	// fmt.Println(c)
 	return nil

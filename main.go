@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/tteeoo/svc/cpu"
-	"time"
 )
 
 func main() {
@@ -13,7 +12,6 @@ func main() {
 			c.Mem.Set(a, (uint16(j)<<8)+0x41)
 			if j%c.VGA.TextWidth == 0 {
 				c.VGA.TextDraw()
-				time.Sleep(time.Second / 120)
 			}
 			a++
 		}
@@ -23,13 +21,24 @@ func main() {
 			c.Mem.Set(a, (((uint16(j)<<8)<<4)+((uint16(j)<<8)>>4)<<4)+0x42)
 			if j%c.VGA.TextWidth == 0 {
 				c.VGA.TextDraw()
-				time.Sleep(time.Second / 120)
 			}
 			a--
 		}
 	}
-	for i, j := range "Hello, world!" {
-		c.Mem.Set(uint16(i), 0x0f00+uint16(j))
+	for x := 0; x < c.VGA.TextHeight; x++ {
+		for i, j := range "Hello, world!" {
+			if x%2 != 0 {
+				c.Mem.Set(uint16((80*x)+i), 0x0f00+uint16(j))
+			}
+		}
+		c.VGA.TextDraw()
 	}
-	c.VGA.TextDraw()
+	for x := c.VGA.TextHeight - 1; x >= 0; x-- {
+		for i, j := range "Hello, world!" {
+			if x%2 == 0 {
+				c.Mem.Set(uint16((80*x)+i+(c.VGA.TextWidth-13)), 0x0f00+uint16(j))
+			}
+		}
+		c.VGA.TextDraw()
+	}
 }
