@@ -3,6 +3,8 @@ package vga
 
 import (
 	"github.com/tteeoo/svc/mem"
+	"fmt"
+	"strings"
 )
 
 // VGA represents a video device.
@@ -15,11 +17,14 @@ type VGA struct {
 	TextHeight int
 	// TextWidth is the width of the text-buffer
 	TextWidth int
+	// LastBuffer stores the last rendered buffer split into lines.
+	LastBuffer []string
 }
 
 // NewVGA returns a pointer to a newly initialized VGA.
 func NewVGA(m *mem.RAM, start uint16, h, w int) *VGA {
 	return &VGA{
+		LastBuffer: []string{},
 		Mem:        m,
 		TextStart:  start,
 		TextHeight: h,
@@ -45,7 +50,7 @@ func (v *VGA) TextDraw() {
 		}
 	}
 	// Print
-	out := "\033[2J\033[H"
+	out := ""
 	for _, i := range tb {
 		for _, j := range i {
 			attr := [2]int{
@@ -125,5 +130,23 @@ func (v *VGA) TextDraw() {
 		}
 		out += "\n"
 	}
-	print(out)
+	current := strings.Split(out, "\n")
+	if len(v.LastBuffer) != len(current) {
+		print("\033[2J\033[H"+out)
+		return
+	}
+	realOut := "\033[H"
+	diffLines := []int{}
+	for i := 0; i < len(current); i++ {
+		if current[i] != v.LastBuffer[i] {
+			diffLines = append(diffLines, i)
+		}
+	}
+	line := 0
+	for _, i := range diffLines {
+		realOut += fmt.Sprintf("\033[%dB", (i - line))
+		realOut += current[i] + "\n"
+		line = i
+	}
+	print(realOut)
 }
