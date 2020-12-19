@@ -67,7 +67,7 @@ Documentation for the assembly language will be written soon.
 
 ## To Do
 
-* A package for parsing and creating svb files.
+* Better tests
 * CPU instructions for sub-routines, the stack, and branching.
 * The ability to load and execute svb files directly.
 * Example programs and documentation.
