@@ -4,9 +4,9 @@ package cpu
 
 import (
 	"fmt"
+	"github.com/tteeoo/svc/dat"
 	"github.com/tteeoo/svc/mem"
 	"github.com/tteeoo/svc/vga"
-	"github.com/tteeoo/svc/dat"
 )
 
 // CPU is a basic implementation of a CPU.
