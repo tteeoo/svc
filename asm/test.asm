@@ -1,5 +1,7 @@
 ; comment
 bar = "AAA"
 foo = 0x88
-nop 
-cpl ac -2
+main:
+	cpl ac -2
+another:
+	nop
