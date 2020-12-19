@@ -4,21 +4,19 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
-	"github.com/tteeoo/svc/cpu"
+	"github.com/tteeoo/svc/dat"
+	"github.com/tteeoo/svc/svb"
 	"strconv"
 	"strings"
 )
 
-// parse parses an input file into memory and opcodes.
-func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
+// parse will parse a pre-processed input file into an SVB struct.
+func parse(b []byte) (svb.SVB, error) {
 
 	var ops [][]uint16
 	var address uint16 = 0x00
-	mem := make(map[uint16]uint16)
-	vars := make(map[string]uint16)
-
-	// CPU for translating opcodes
-	c := cpu.NewCPU()
+	constants := []svb.Constant{}
+	insructions := []svb.Instruction{}
 
 	// Iterate lines
 	split := strings.Split(string(b), "\n")
@@ -44,7 +42,7 @@ func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
 			}
 		}
 
-		// Handle mem
+		// Handle constants
 		if (len(splitLine) == 3) && (splitLine[1] == "=") {
 			if len(splitLine[2]) > 2 {
 
@@ -66,7 +64,7 @@ func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
 					vars[splitLine[0]] = address
 					b, err := hex.DecodeString(val)
 					if err != nil {
-						return nil, nil, err
+						return svb.SVB{}, err
 					}
 					mem[address] = binary.BigEndian.Uint16(b)
 					address++
@@ -77,7 +75,7 @@ func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
 			// Handle an int
 			i, err := strconv.Atoi(splitLine[2])
 			if err != nil {
-				return nil, nil, err
+				return svb.SVB{}, err
 			}
 			vars[splitLine[0]] = address
 			mem[address] = uint16(i)
@@ -86,7 +84,11 @@ func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
 		} else if len(splitLine) > 0 {
 			// Handle instruction
 			op := make([]uint16, len(splitLine))
-			op[0] = c.GetOp(splitLine[0])
+			code, exists := dat.OpNameToCode[splitLine[0]]
+			if !exists {
+				return svb.SVB{}, fmt.Errorf("instruction \"%s\" does not exist", splitLine[0])
+			}
+			op[0] = code
 
 			for i, j := range splitLine[1:] {
 				if (len(j) > 2) && (j[1] == 'x') {
@@ -97,7 +99,7 @@ func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
 					}
 					b, err := hex.DecodeString(val)
 					if err != nil {
-						return nil, nil, err
+						return svb.SVB{}, err
 					}
 					op[i+1] = binary.BigEndian.Uint16(b)
 
@@ -105,11 +107,11 @@ func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
 					// Handle address
 					variable, exists := vars[j[1:len(j)-1]]
 					if !exists {
-						return nil, nil, fmt.Errorf("address %s not declared", j[1:len(j)-1])
+						return svb.SVB{}, fmt.Errorf("address %s not declared", j[1:len(j)-1])
 					}
 					op[i+1] = variable
 
-				} else if num, exists := c.RegNames[j]; exists {
+				} else if num, exists := dat.RegNamesToNum[j]; exists {
 					// Handle register alias
 					op[i+1] = num
 
@@ -118,14 +120,14 @@ func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
 					if j[0] == '-' && len(j) > 1 {
 						n, err := strconv.Atoi(j[1:])
 						if err != nil {
-							return nil, nil, err
+							return svb.SVB{}, err
 						}
 						op[i+1] = ^uint16(n) + 1
 					} else {
 						// Positive number
 						n, err := strconv.Atoi(j)
 						if err != nil {
-							return nil, nil, err
+							return svb.SVB{}, err
 						}
 						op[i+1] = uint16(n)
 					}
@@ -136,5 +138,5 @@ func parse(b []byte) (map[uint16]uint16, [][]uint16, error) {
 		}
 	}
 
-	return mem, ops, nil
+	return svbStruct, nil
 }

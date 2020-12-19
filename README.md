@@ -1,4 +1,4 @@
-# Simple Virtual Computer (svc)
+# Simple Virtual Computer
 
 Currently under development; this is a work in progress.
 

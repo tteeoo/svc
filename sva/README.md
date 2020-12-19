@@ -1,4 +1,4 @@
-# Simple Virtual Assembler (sva)
+# Simple Virtual Assembler
 
 The assembler for the Simple Virtual Computer.
 
