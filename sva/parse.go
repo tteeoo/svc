@@ -6,7 +6,6 @@ import (
 	"github.com/tteeoo/svc/dat"
 	"github.com/tteeoo/svc/svb"
 	"strconv"
-	"strings"
 )
 
 // parseHex will take a hex-representing string and parse it to a uint16.
@@ -52,7 +51,7 @@ func parseNum(s string) (uint16, error) {
 }
 
 // parse will parse a pre-processed input file into an SVB struct.
-func parse(b []byte) (svb.SVB, error) {
+func parse(lines [][]string) (svb.SVB, error) {
 
 	vars := make(map[string]uint16)
 	subs := make(map[string]uint16)
@@ -62,28 +61,7 @@ func parse(b []byte) (svb.SVB, error) {
 	binary := svb.SVB{}
 
 	// Iterate lines
-	split := strings.Split(string(b), "\n")
-	for _, line := range split {
-
-		// Parse out comments
-		noComments := ""
-		for _, char := range line {
-			if char == ';' {
-				break
-			}
-			noComments += string(char)
-		}
-
-		// Tokenize
-		badSplitLine := strings.Split(strings.Replace(noComments, "\t", "", -1), " ")
-
-		// Remove empty strings
-		var splitLine []string
-		for _, str := range badSplitLine {
-			if str != "" {
-				splitLine = append(splitLine, str)
-			}
-		}
+	for _, splitLine := range lines {
 
 		// Handle constants
 		if (len(splitLine) == 3) && (splitLine[1] == "=") {

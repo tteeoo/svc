@@ -21,6 +21,7 @@ Each line in an input file does one of four things:
 . <path to another file>
 ```
 Works as if the contents of the other file were directly inserted into the current file at this line.
+This will only go one file deep. A file that is sourced cannot source another file.
 
 Examples:
 ```

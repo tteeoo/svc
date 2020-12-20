@@ -29,8 +29,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Pre-process input
+	lines, err := preProcess(b, true)
+	if err != nil {
+		fmt.Println("error pre-processing:", err)
+		os.Exit(1)
+	}
+
 	// Parse input
-	svbStruct, err := parse(b)
+	svbStruct, err := parse(lines)
 	if err != nil {
 		fmt.Println("error parsing:", err)
 		os.Exit(1)
