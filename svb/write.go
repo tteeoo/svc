@@ -35,7 +35,7 @@ func (s SVB) Bytes() ([]byte, error) {
 	for _, sub := range s.Subroutines {
 		u[i] = 0xffff
 		u[i+1] = sub.Address
-		opi := 0
+		opi := i + 2
 		for _, op := range sub.Instructions {
 			u[opi] = op.Opcode
 			for _, and := range op.Operands {
@@ -43,7 +43,7 @@ func (s SVB) Bytes() ([]byte, error) {
 				u[opi] = and
 			}
 		}
-		i += i + sub.Size + 2
+		i += sub.Size + 2
 	}
 
 	// Convert uint16 to binary

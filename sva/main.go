@@ -30,14 +30,16 @@ func main() {
 	}
 
 	// Parse input
-	mem, ops, err := parse(b)
+	svbStruct, err := parse(b)
 	if err != nil {
 		fmt.Println("error parsing:", err)
 		os.Exit(1)
 	}
 
+	fmt.Println(svbStruct)
+
 	// Parse binary
-	out, err := svb{mem: mem, ops: ops}.bytes()
+	out, err := svbStruct.Bytes()
 	if err != nil {
 		fmt.Println("error parsing binary:", err)
 		os.Exit(1)
