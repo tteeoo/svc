@@ -1,44 +1,44 @@
 package main
 
 import (
+	"fmt"
 	"github.com/tteeoo/svc/cpu"
+	"github.com/tteeoo/svc/dat"
+	"github.com/tteeoo/svc/mem"
+	"github.com/tteeoo/svc/svb"
+	"github.com/tteeoo/svc/vga"
+	"io/ioutil"
+	"os"
 )
 
 func main() {
-	c := cpu.NewCPU()
-	a := uint16(0)
-	for i := 0; i < c.VGA.TextHeight; i++ {
-		for j := 0; j < c.VGA.TextWidth; j++ {
-			c.Mem.Set(a, (uint16(j)<<8)+0x41)
-			if j%c.VGA.TextWidth == 0 {
-				c.VGA.TextDraw()
-			}
-			a++
-		}
+
+	// Get program file
+	if len(os.Args) < 2 {
+		fmt.Printf("run like this: %s <svb file>\n", os.Args[0])
+		os.Exit(1)
 	}
-	for i := c.VGA.TextHeight - 1; i >= 0; i-- {
-		for j := 0; j < c.VGA.TextWidth; j++ {
-			c.Mem.Set(a, (((uint16(j)<<8)<<4)+((uint16(j)<<8)>>4)<<4)+0x42)
-			if j%c.VGA.TextWidth == 0 {
-				c.VGA.TextDraw()
-			}
-			a--
-		}
+	programFile := os.Args[1]
+
+	// Open program
+	b, err := ioutil.ReadFile(programFile)
+	if err != nil {
+		fmt.Println("error reading program file:", err)
+		os.Exit(1)
 	}
-	for x := 0; x < c.VGA.TextHeight; x++ {
-		for i, j := range "Hello, world!" {
-			if x%2 != 0 {
-				c.Mem.Set(uint16((80*x)+i), 0x0f00+uint16(j))
-			}
-		}
-		c.VGA.TextDraw()
+
+	// Parse program
+	program, err := svb.ParseBinary(b)
+	if err != nil {
+		fmt.Println("error parsing program file:", err)
+		os.Exit(1)
 	}
-	for x := c.VGA.TextHeight - 1; x >= 0; x-- {
-		for i, j := range "Hello, world!" {
-			if x%2 == 0 {
-				c.Mem.Set(uint16((80*x)+i+(c.VGA.TextWidth-13)), 0x0f00+uint16(j))
-			}
-		}
-		c.VGA.TextDraw()
-	}
+
+	// Initialize CPU
+	space := program.GetProgramMem()
+	m := mem.NewRAM(space)
+	v := vga.NewVGA(m, dat.VGAOffset, dat.VGAHeight, dat.VGAWidth)
+	c := cpu.NewCPU(program.MainAddress, m, v)
+
+	fmt.Println(c)
 }

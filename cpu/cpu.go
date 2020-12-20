@@ -20,7 +20,7 @@ type CPU struct {
 }
 
 // NewCPU returns a pointer to a newly initialized CPU.
-func NewCPU() *CPU {
+func NewCPU(pc uint16, m *mem.RAM, v *vga.VGA) *CPU {
 
 	// Create registers
 	regs := make(map[uint16]*Register)
@@ -30,11 +30,12 @@ func NewCPU() *CPU {
 	for _, i := range []string{"ex", "ac", "sp", "pc"} {
 		regs[dat.RegNamesToNum[i]] = NewRegister()
 	}
+	regs[dat.RegNamesToNum["pc"]].Set(pc)
+	regs[dat.RegNamesToNum["sp"]].Set(dat.StackOffset)
 
-	m := mem.NewRAM()
 	return &CPU{
 		Mem:  m,
-		VGA:  vga.NewVGA(m, dat.VGAOffset, dat.VGAHeight, dat.VGAWidth),
+		VGA:  v,
 		Regs: regs,
 	}
 }
@@ -185,15 +186,19 @@ func (c *CPU) Op(opcode uint16, operands []uint16) error {
 
 // String returns a string representation of a CPU.
 func (c *CPU) String() string {
+
 	out := "Registers:"
 	for i := 0; i < dat.GPRNum; i++ {
 		out += fmt.Sprintf("\n%d:%s", i, c.Regs[uint16(i)])
 	}
+
 	out += fmt.Sprintf("\nex:%s", c.Regs[dat.RegNamesToNum["ex"]])
 	out += fmt.Sprintf("\nac:%s", c.Regs[dat.RegNamesToNum["ac"]])
 	out += fmt.Sprintf("\nsp:%s", c.Regs[dat.RegNamesToNum["sp"]])
 	out += fmt.Sprintf("\npc:%s", c.Regs[dat.RegNamesToNum["pc"]])
+
 	out += "\nMemory:\n"
 	out += c.Mem.String()
+
 	return out
 }

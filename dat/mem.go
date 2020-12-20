@@ -12,4 +12,8 @@ var (
 
 	// ProgramOffset is the offset that the program is stored at in memory.
 	ProgramOffset = uint16(0x900)
+
+	// StackOffset is the offset that the stack is stored at in memory.
+	// Note that the stack counts down.
+	StackOffset = uint16(0x8ff)
 )

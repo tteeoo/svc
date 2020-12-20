@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"strings"
 	"io/ioutil"
-	"path"
 	"os"
+	"path"
+	"strings"
 )
 
 // preProcess will preProcess an assembly file.
@@ -75,10 +75,10 @@ func preProcess(b []byte, allowSource bool) ([][]string, error) {
 				}
 			} else {
 				return [][]string{},
-				fmt.Errorf(
-					"cannot recursively source files (attempting to source %s)",
-					splitLine[1],
-				)
+					fmt.Errorf(
+						"cannot recursively source files (attempting to source %s)",
+						splitLine[1],
+					)
 			}
 		} else {
 			lines = append(lines, splitLine)
