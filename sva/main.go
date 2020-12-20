@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"github.com/tteeoo/svc/svb"
 )
 
 func main() {
@@ -31,11 +30,13 @@ func main() {
 	}
 
 	// Parse input
-	svbStruct, err := svb.ParseBinary(b)
+	svbStruct, err := parse(b)
 	if err != nil {
 		fmt.Println("error parsing:", err)
 		os.Exit(1)
 	}
+
+	fmt.Println(svbStruct)
 
 	// Parse binary
 	out, err := svbStruct.Bytes()

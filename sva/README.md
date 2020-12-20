@@ -70,23 +70,23 @@ cmp ac 3    ; compares the value of the accumulator and register 3
 <name>:
 ```
 This will define a new subroutine with all of the instructions below it, until the next one is defined.
-Subroutines can be used by jump instructions like `jmp`, `jme`, or `jne` with the `{name}` syntax.
+Subroutines can be used by jumping instructions (`cal`, `jmp`, etc.) with the `{name}` syntax.
 Every program should have a `main` subroutine. This is a special subroutine that is compiled so that it is the entrypoint to your program (where the CPU starts reading).
 
 Examples:
 ```asm
 ; prints "A" if 0xff equals 0xff
-
-main:
-  cpl ac 0xff ; copies 0xff into the accumulator
-  cpl 0 0xff  ; copies 0xff into register 0
-  cmp ac 0    ; compares the value of the accumulator and register 0
-  jme {print}
-
 print:
   cpl 3 0x0f41 ; copies 0x0f41 into register 3
   str 0 3      ; stores the value held in register 3 at the first address in memory
   vga          ; re-draws the text buffer, printing "A" with white text and black background
+  ret
+  
+main:
+  cpl ac 0xff ; copies 0xff into the accumulator
+  cpl 0 0xff  ; copies 0xff into register 0
+  cmp ac 0    ; compares the value of the accumulator and register 0
+  cal {print}
 ```
 
 ## The Simple Virtual Binary Format
