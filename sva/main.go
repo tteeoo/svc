@@ -36,8 +36,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println(svbStruct)
-
 	// Parse binary
 	out, err := svbStruct.Bytes()
 	if err != nil {

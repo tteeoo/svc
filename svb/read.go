@@ -5,9 +5,6 @@ import (
 	"github.com/tteeoo/svc/dat"
 )
 
-// MainAddress is the address of the subroutine that should be main.
-var MainAddress = uint16(0x900)
-
 // ParseBinary deserializes an SVB.
 func ParseBinary(b []byte) (SVB, error) {
 	if len(b) < 7 {
@@ -51,9 +48,6 @@ func ParseBinary(b []byte) (SVB, error) {
 		a := doubled[idx+1]
 		name := ""
 		ints := []Instruction{}
-		if a == MainAddress {
-			name = "main"
-		}
 
 		// Parse out instructions
 		opIdx := idx + 2
@@ -109,5 +103,6 @@ func ParseBinary(b []byte) (SVB, error) {
 	return SVB{
 		Subroutines: subs,
 		Constants:   consts,
+		MainAddress: subs[len(subs)-1].Address,
 	}, nil
 }

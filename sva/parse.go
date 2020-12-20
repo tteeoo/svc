@@ -86,6 +86,13 @@ func parse(b []byte) (svb.SVB, error) {
 
 		// Handle constants
 		if (len(splitLine) == 3) && (splitLine[1] == "=") {
+			if currentSub.Size != -1 {
+				return svb.SVB{},
+					fmt.Errorf("you cannot define a constant inside of a subroutine (%s is in %s)",
+						splitLine,
+						currentSub.Name,
+					)
+			}
 			if len(splitLine[2]) > 2 {
 
 				// Handle a string
@@ -94,6 +101,7 @@ func parse(b []byte) (svb.SVB, error) {
 					vars[splitLine[0]] = address
 					for _, char := range splitLine[2][1 : len(splitLine[2])-1] {
 						constants = append(constants, svb.Constant{
+							Name:    splitLine[0],
 							Address: address,
 							Value:   uint16(char),
 						})
@@ -110,6 +118,7 @@ func parse(b []byte) (svb.SVB, error) {
 					// Create constant
 					vars[splitLine[0]] = address
 					constants = append(constants, svb.Constant{
+						Name:    splitLine[0],
 						Address: address,
 						Value:   val,
 					})
@@ -125,6 +134,7 @@ func parse(b []byte) (svb.SVB, error) {
 			}
 			vars[splitLine[0]] = address
 			constants = append(constants, svb.Constant{
+				Name:    splitLine[0],
 				Address: address,
 				Value:   uint16(i),
 			})
@@ -138,6 +148,7 @@ func parse(b []byte) (svb.SVB, error) {
 			}
 			if currentSub.Size != -1 {
 				binary.Subroutines = append(binary.Subroutines, currentSub)
+				address += uint16(currentSub.Size)
 			}
 
 			subs[name] = address
@@ -145,7 +156,6 @@ func parse(b []byte) (svb.SVB, error) {
 				Name:    name,
 				Address: address,
 			}
-			address++
 
 		} else if len(splitLine) > 0 {
 
@@ -198,7 +208,12 @@ func parse(b []byte) (svb.SVB, error) {
 			// Check that the right number of operands are provided
 			size := dat.OpNameToSize[splitLine[0]]
 			if len(operands) != size {
-				return svb.SVB{}, fmt.Errorf("operation %s expected %d operands, but received %d", splitLine, size, len(operands))
+				return svb.SVB{},
+					fmt.Errorf("operation %s expected %d operands, but received %d",
+						splitLine,
+						size,
+						len(operands),
+					)
 			}
 
 			// Check to make sure instruction is in a defined subroutine
@@ -221,7 +236,10 @@ func parse(b []byte) (svb.SVB, error) {
 	}
 	binary.Constants = constants
 
-	// TODO: fix overlapping addresses and set main subroutine address
+	if currentSub.Name != "main" {
+		return svb.SVB{}, fmt.Errorf("the last subroutine (%s) is not named main", currentSub.Name)
+	}
+	binary.MainAddress = currentSub.Address
 
 	return binary, nil
 }
