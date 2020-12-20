@@ -15,6 +15,7 @@ func parseHex(s string) (uint16, error) {
 	if len(s) > 4 {
 		return 0, fmt.Errorf("hex value \"%s\" is too large", s)
 	}
+
 	// Pad and decode
 	b, err := hex.DecodeString(fmt.Sprintf("%0*s", 4, s))
 	if err != nil {
@@ -55,7 +56,7 @@ func parse(b []byte) (svb.SVB, error) {
 
 	vars := make(map[string]uint16)
 	subs := make(map[string]uint16)
-	address := uint16(0)
+	address := dat.ProgramOffset
 	constants := []svb.Constant{}
 	currentSub := svb.Subroutine{Size: -1}
 	binary := svb.SVB{}

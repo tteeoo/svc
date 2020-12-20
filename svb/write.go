@@ -38,9 +38,10 @@ func (s SVB) Bytes() ([]byte, error) {
 		opi := i + 2
 		for _, op := range sub.Instructions {
 			u[opi] = op.Opcode
+			opi++
 			for _, and := range op.Operands {
-				opi++
 				u[opi] = and
+				opi++
 			}
 		}
 		i += sub.Size + 2

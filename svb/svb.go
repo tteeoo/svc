@@ -29,5 +29,5 @@ type Subroutine struct {
 type SVB struct {
 	Constants   []Constant
 	Subroutines []Subroutine
-	MainAddress  uint16
+	MainAddress uint16
 }

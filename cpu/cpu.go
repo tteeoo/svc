@@ -34,7 +34,7 @@ func NewCPU() *CPU {
 	m := mem.NewRAM()
 	return &CPU{
 		Mem:  m,
-		VGA:  vga.NewVGA(m, 0x00, 25, 80),
+		VGA:  vga.NewVGA(m, dat.VGAOffset, dat.VGAHeight, dat.VGAWidth),
 		Regs: regs,
 	}
 }
