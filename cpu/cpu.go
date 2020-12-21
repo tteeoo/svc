@@ -25,11 +25,8 @@ func NewCPU(m *mem.RAM, v *vga.VGA) *CPU {
 
 	// Create registers
 	regs := make(map[uint16]uint16)
-	for i := 0; i < dat.GPRNum; i++ {
-		regs[uint16(i)] = 0
-	}
-	for _, i := range []string{"ex", "ac", "sp", "pc"} {
-		regs[dat.RegNamesToNum[i]] = 0
+	for _, n := range dat.RegNamesToNum {
+		regs[n] = 0
 	}
 	regs[dat.RegNamesToNum["sp"]] = dat.StackOffset
 
@@ -65,6 +62,9 @@ func (c *CPU) Run(address uint16) {
 		for i := 0; i < size; i++ {
 			operands[i] = c.Mem.Get(pc + uint16(1+i))
 		}
+
+		// Set the lc register
+		c.Regs[dat.RegNamesToNum["lc"]] = pc
 
 		// Increase program counter
 		c.Regs[dat.RegNamesToNum["pc"]] += uint16(1 + size)
@@ -218,14 +218,9 @@ func (c *CPU) String() string {
 	out += c.Mem.String()
 
 	out += "\nRegisters:"
-	for i := 0; i < dat.GPRNum; i++ {
-		out += fmt.Sprintf("\n%d:%x", i, c.Regs[uint16(i)])
+	for k, v := range dat.RegNamesToNum {
+		out += fmt.Sprintf("\n%s:%x", k, c.Regs[v])
 	}
-
-	out += fmt.Sprintf("\nex:%x", c.Regs[dat.RegNamesToNum["ex"]])
-	out += fmt.Sprintf("\nac:%x", c.Regs[dat.RegNamesToNum["ac"]])
-	out += fmt.Sprintf("\nsp:%x", c.Regs[dat.RegNamesToNum["sp"]])
-	out += fmt.Sprintf("\npc:%x", c.Regs[dat.RegNamesToNum["pc"]])
 
 	return out
 }

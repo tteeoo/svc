@@ -56,14 +56,15 @@ This repository contains the virtual machine and an assembler to compile program
 
 | Number | Alias | Purpose                                                                                  |
 | ------ | ----- | -------                                                                                  |
-| `0`    |       | General purpose: used for whatever your program desires                                  |
-| `1`    |       | General purpose                                                                          |
-| `2`    |       | General purpose                                                                          |
-| `3`    |       | General purpose                                                                          |
+| `0`    | aa    | General purpose: used for whatever your program desires                                  |
+| `1`    | bb    | General purpose                                                                          |
+| `2`    | cc    | General purpose                                                                          |
+| `3`    | dd    | General purpose                                                                          |
 | `4`    | ex    | Extra: holds the output of miscellaneous instructions, or extra arithmetic output values |
 | `5`    | ac    | Accumulator: holds the output of most arithmetic operations                              |
 | `6`    | sp    | Stack pointer: holds the address of the top location in memory of the stack              |
 | `7`    | pc    | Program counter: holds the addess of the next instruction in memory to be executed       |
+| `8`    | lc    | Last counter: holds the last value of the program counter, useful for loops              |
 
 ## The Simple Virtual Assembler (sva)
 

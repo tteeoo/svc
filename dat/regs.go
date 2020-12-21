@@ -8,9 +8,14 @@ const (
 var (
 	// RegNamesToNum maps register names to numbers.
 	RegNamesToNum = map[string]uint16{
+		"aa": 0,
+		"bb": 1,
+		"cc": 2,
+		"dd": 3,
 		"ex": 4,
 		"ac": 5,
 		"sp": 6,
 		"pc": 7,
+		"lc": 8,
 	}
 )

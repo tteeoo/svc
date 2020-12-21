@@ -1,51 +1,55 @@
-; Note: I still need to make the parser check for spaces
+; Note: I still need to make the parser check for spaces.
 text = "Hello,World!"
 
 print:
-  ; The address of the character in ram should be in register 1
-  ; The address to store the character in ram should be in register 2
+  ; The address of the character in ram should be in aa.
+  ; The address to store the character in ram should be in bb.
 
-  ; Load the character from ram
-  ldr 0 1
+  ; Load the character from ram.
+  ldr ac aa
 
-  ; Apply the colors
-  cop ac 0
-  cpl 3 0x0f00
-  orr 3
+  ; Apply the colors (black background, white foreground).
+  cpl dd 0x0f00
+  orr dd
 
-  ; Store the character in the text buffer
-  str 2 ac
+  ; Store the character in the text buffer.
+  str bb ac
 
+  ; Return back to after the cal instruction.
   ret
-
 
 main:
 
-  ; Initialize registers 1 and 2 with the start of the string
-  ; and the number of the character, respectively
-  cpl 1 [text]
-  cpl 2 0
+  ; Initialize registers aa and bb.
+  ; aa will hold the address of the character to print in memory.
+  ; bb will hold the number of characters that have been printed.
+  cpl aa [text]
+  cpl bb 0
 
-  ; Push the program counter on to the stack
-  psh pc
+  ; Push lc on to the stack.
+  ; The value of lc is equivalent to the address
+  ; of the current executing instruction.
+  ; This will be pushed onto the stack and used to loop back to.
+  psh lc
 
-  ; Print a character
+  ; Print a character.
   cal {print}
 
-  ; Get ready for the next print
-  inc 1
-  inc 2
+  ; Get ready for the next print.
+  ; Since the text we want to print is consecutively stored in memory
+  ; we can just increment the address to get the next one.
+  ; We also increment the number of characters printed.
+  inc aa
+  inc bb
 
-  ; Check if we have printed 12 characters
-  cpl 3 12
-  cmp 2 3
+  ; Check if we have printed 12 characters.
+  cpl dd 12
+  cmp bb dd
 
-  ; Note: I should probably implement a more effecient way of looping
-  pop 0
-  dec 0
-  dec 0
-  gtn 0
+  ; Loop back to the psh instruction if we have not printed 12 characters.
+  pop cc
+  gtn cc
 
+  ; Draw the text-buffer.
   vga
 
-  ret
