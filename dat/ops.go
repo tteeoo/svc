@@ -26,6 +26,13 @@ var (
 		"psh": 0x14,
 		"pop": 0x15,
 		"ret": 0x16,
+		"cal": 0x17,
+		"cmp": 0x18,
+		"cle": 0x19,
+		"cln": 0x1a,
+		"gto": 0x1b,
+		"gte": 0x1c,
+		"gtn": 0x1d,
 	}
 
 	// OpCodeToName is the reverse of OpNameToCode.
@@ -57,5 +64,12 @@ var (
 		"psh": 1,
 		"pop": 1,
 		"ret": 0,
+		"cal": 1,
+		"cmp": 2,
+		"cle": 1,
+		"cln": 1,
+		"gto": 1,
+		"gte": 1,
+		"gtn": 1,
 	}
 )

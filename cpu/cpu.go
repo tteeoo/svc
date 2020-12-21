@@ -57,29 +57,21 @@ func (c *CPU) Run(address uint16) {
 			os.Exit(0)
 		}
 
+		// Get instruction
 		op := c.Mem.Get(pc)
 		name := dat.OpCodeToName[op]
 		size := dat.OpNameToSize[name]
-
 		operands := make([]uint16, size)
 		for i := 0; i < size; i++ {
 			operands[i] = c.Mem.Get(pc + uint16(1+i))
 		}
 
+		// Increase program counter
 		c.Regs[dat.RegNamesToNum["pc"]] += uint16(1 + size)
 
+		// Execute instruction
 		c.Op(op, operands)
 	}
-}
-
-// GetOp returns to opcode whose name is provided.
-// Returns 0x00 (nop) if the name is not defined.
-func (c *CPU) GetOp(name string) uint16 {
-	opcode, exists := dat.OpNameToCode[name]
-	if !exists {
-		opcode = 0x00
-	}
-	return opcode
 }
 
 // Op executes an opcode with the given operands.
@@ -168,7 +160,7 @@ func (c *CPU) Op(opcode uint16, operands []uint16) {
 	// psh (reg with value)
 	case 0x14:
 		c.Regs[dat.RegNamesToNum["sp"]]--
-		c.Mem.Set(c.Regs[dat.RegNamesToNum["sp"]], operands[0])
+		c.Mem.Set(c.Regs[dat.RegNamesToNum["sp"]], c.Regs[operands[0]])
 	// pop (reg to store in)
 	case 0x15:
 		c.Regs[operands[0]] = c.Mem.Get(c.Regs[dat.RegNamesToNum["sp"]])
@@ -177,16 +169,46 @@ func (c *CPU) Op(opcode uint16, operands []uint16) {
 	case 0x16:
 		c.Regs[dat.RegNamesToNum["pc"]] = c.Mem.Get(c.Regs[dat.RegNamesToNum["sp"]])
 		c.Regs[dat.RegNamesToNum["sp"]]++
-		// TODO:
-		// cal
-		// cmp
-		// cle
-		// cln
-		// jmp
-		// cle
-		// cln
+	// cal (address to jump to)
+	case 0x17:
+		c.Regs[dat.RegNamesToNum["sp"]]--
+		c.Mem.Set(c.Regs[dat.RegNamesToNum["sp"]], c.Regs[dat.RegNamesToNum["pc"]])
+		c.Regs[dat.RegNamesToNum["pc"]] = operands[0]
+	// cmp (register, register)
+	case 0x18:
+		if c.Regs[operands[0]] == c.Regs[operands[1]] {
+			c.Regs[dat.RegNamesToNum["ex"]] = 0xffff
+		} else {
+			c.Regs[dat.RegNamesToNum["ex"]] = 0xfffe
+		}
+	// cle (address to jump to)
+	case 0x19:
+		if c.Regs[dat.RegNamesToNum["ex"]] == 0xffff {
+			c.Regs[dat.RegNamesToNum["sp"]]--
+			c.Mem.Set(c.Regs[dat.RegNamesToNum["sp"]], c.Regs[dat.RegNamesToNum["pc"]])
+			c.Regs[dat.RegNamesToNum["pc"]] = operands[0]
+		}
+	// cln (address to jump to)
+	case 0x1a:
+		if c.Regs[dat.RegNamesToNum["ex"]] == 0xfffe {
+			c.Regs[dat.RegNamesToNum["sp"]]--
+			c.Mem.Set(c.Regs[dat.RegNamesToNum["sp"]], c.Regs[dat.RegNamesToNum["pc"]])
+			c.Regs[dat.RegNamesToNum["pc"]] = operands[0]
+		}
+	// gto (register holding address to jump to)
+	case 0x1b:
+		c.Regs[dat.RegNamesToNum["pc"]] = c.Regs[operands[0]]
+	// gte (register holding address to jump to)
+	case 0x1c:
+		if c.Regs[dat.RegNamesToNum["ex"]] == 0xffff {
+			c.Regs[dat.RegNamesToNum["pc"]] = c.Regs[operands[0]]
+		}
+	// gtn (register holding address to jump to)
+	case 0x1d:
+		if c.Regs[dat.RegNamesToNum["ex"]] == 0xfffe {
+			c.Regs[dat.RegNamesToNum["pc"]] = c.Regs[operands[0]]
+		}
 	}
-	// fmt.Println(c)
 }
 
 // String returns a string representation of a CPU.

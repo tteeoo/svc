@@ -43,7 +43,14 @@ This repository contains the virtual machine and an assembler to compile program
 | `0x13` | vga  |                                                     | Prints the VGA text buffer to the screen                                                                                                                 |
 | `0x14` | psh  | `register`                                          | Decreases the stack pointer and sets the top value of the stack to the value held in a register                                                          |
 | `0x15` | pop  | `register`                                          | Stores the top value of the stack in a register and increases the stack pointer                                                                          |
-| `0x16` | ret  |                                                     | Sets the program couter to the top value of the stack and increases the stack pointer                                                                    |
+| `0x16` | ret  |                                                     | Pops the program counter off of the stack                                                                                                                |
+| `0x17` | cal  | `address`                                           | Pushes the program counter onto the stack and sets the program counter to an address                                                                     |
+| `0x18` | cmp  | `register` `register`                               | If the values of two registers are the same, the extra register is set to `0xffff`, else `0xfffe`                                                        |
+| `0x19` | cle  | `address`                                           | Equivalent to "cal", but only executes if the extra register is set to `0xffff`                                                                          |
+| `0x1a` | cln  | `address`                                           | Equivalent to "cal", but only executes if the extra register is set to `0xfffe`                                                                          |
+| `0x1b` | gto  | `register`                                          | Sets the program counter to the value held in a register                                                                                                 |
+| `0x1c` | gte  | `register`                                          | Equivalent to "gto", but only executes if the extra register is set to `0xffff`                                                                          |
+| `0x1d` | gtn  | `register`                                          | Equivalent to "gto", but only executes if the extra register is set to `0xfffe`                                                                          |
 
 ## CPU Registers
 
@@ -64,18 +71,22 @@ In the directory `sva` you'll find the source code for the assembler.
 
 It reads a rudimentary assembly language and outputs an equally simple binary format called "svb".
 
-Usage: `sva <input file> [-o output file]`
+Usage:
+```
+sva <input file> [-o output file]
+```
 
-Then, to run the assembled program, run: `svc <svb file>`
+Then, to run the assembled program, run:
+```
+svc <svb file>
+```
 
-See [the sva directory](https://github.com/tteeoo/svc/tree/main/sva) for more documentation, and the
-[the asm directory](https://github.com/tteeoo/svc/tree/main/asm) for some example programs.
+See the [sva directory](https://github.com/tteeoo/svc/tree/main/sva) for more documentation, and the [asm directory](https://github.com/tteeoo/svc/tree/main/asm) for some example programs.
 
 ## To Do
 
 * Better tests
 * Keyboard input
-* CPU instructions for branching and jumping.
 * Example programs and documentation.
 * Some sort of debugging mode.
 
