@@ -86,6 +86,12 @@ func parse(lines [][]string) (svb.SVB, error) {
 						})
 						address++
 					}
+					constants = append(constants, svb.Constant{
+						Name:    splitLine[0],
+						Address: address,
+						Value:   uint16(0),
+					})
+					address++
 					continue
 
 				} else if splitLine[2][1] == 'x' {
