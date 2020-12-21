@@ -73,26 +73,26 @@ cpl dd -2   ; copies -2 into register 3
 cmp ac dd   ; compares the value of the accumulator and dd
 ```
 
-##### Instruction expansions
+###### Instruction expansions
 An instruction expansion is syntactic sugar, allowing two instructions to be defined with one line.
 They can take two forms: either mapping one operation to two sets of operands, or mapping two operations to one set of operands.
 
 For example, this code:
-```
+```asm
 inc aa, bb
 ```
 Will expand to this:
-```
+```asm
 inc aa
 inc bb
 ```
 
 And this code:
-```
+```asm
 inc, add aa
 ```
 Will expand to:
-```
+```asm
 inc aa
 add aa
 ```
