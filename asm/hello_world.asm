@@ -6,7 +6,8 @@
 text = "Hello, World!"
 
 ; Source the print.asm file.
-. print.asm
+; It contains the print_char subroutine.
+. lib/print.asm
 
 main:
 
