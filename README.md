@@ -66,13 +66,16 @@ It reads a rudimentary assembly language and outputs an equally simple binary fo
 
 Usage: `sva <input file> [-o output file]`
 
-Documentation for the assembly language will be written soon.
+Then, to run the assembled program, run: `svc <svb file>`
+
+See [the sva directory](https://github.com/tteeoo/svc/tree/main/sva) for more documentation, and the
+[the asm directory](https://github.com/tteeoo/svc/tree/main/asm) for some example programs.
 
 ## To Do
 
 * Better tests
-* CPU instructions for sub-routines, the stack, and branching.
-* The ability to load and execute svb files directly.
+* Keyboard input
+* CPU instructions for branching and jumping.
 * Example programs and documentation.
 * Some sort of debugging mode.
 

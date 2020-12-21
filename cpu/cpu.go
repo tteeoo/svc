@@ -3,11 +3,11 @@
 package cpu
 
 import (
-	"os"
 	"fmt"
 	"github.com/tteeoo/svc/dat"
 	"github.com/tteeoo/svc/mem"
 	"github.com/tteeoo/svc/vga"
+	"os"
 )
 
 // CPU is a basic implementation of a CPU.
@@ -16,22 +16,22 @@ type CPU struct {
 	Mem *mem.RAM
 	// VGA is the main video device used by the CPU.
 	VGA *vga.VGA
-	// Regs maps numbers to regsiters.
-	Regs map[uint16]*Register
+	// Regs maps numbers to regsiter values.
+	Regs map[uint16]uint16
 }
 
 // NewCPU returns a pointer to a newly initialized CPU.
 func NewCPU(m *mem.RAM, v *vga.VGA) *CPU {
 
 	// Create registers
-	regs := make(map[uint16]*Register)
+	regs := make(map[uint16]uint16)
 	for i := 0; i < dat.GPRNum; i++ {
-		regs[uint16(i)] = NewRegister()
+		regs[uint16(i)] = 0
 	}
 	for _, i := range []string{"ex", "ac", "sp", "pc"} {
-		regs[dat.RegNamesToNum[i]] = NewRegister()
+		regs[dat.RegNamesToNum[i]] = 0
 	}
-	regs[dat.RegNamesToNum["sp"]].Set(dat.StackOffset)
+	regs[dat.RegNamesToNum["sp"]] = dat.StackOffset
 
 	return &CPU{
 		Mem:  m,
@@ -45,12 +45,12 @@ func (c *CPU) Run(address uint16) {
 
 	// Push exit address onto stack
 	sp := dat.RegNamesToNum["sp"]
-	c.Regs[sp].Set(c.Regs[sp].Get() - 1)
-	c.Mem.Set(c.Regs[dat.RegNamesToNum["sp"]].Get(), 0xffff)
+	c.Regs[sp]--
+	c.Mem.Set(c.Regs[sp], 0xffff)
 
-	c.Regs[dat.RegNamesToNum["pc"]].Set(address)
+	c.Regs[dat.RegNamesToNum["pc"]] = address
 	for {
-		pc := c.Regs[dat.RegNamesToNum["pc"]].Get()
+		pc := c.Regs[dat.RegNamesToNum["pc"]]
 
 		// Exit if pc is the last address
 		if pc == 0xffff {
@@ -63,11 +63,12 @@ func (c *CPU) Run(address uint16) {
 
 		operands := make([]uint16, size)
 		for i := 0; i < size; i++ {
-			operands[i] = c.Mem.Get(pc+uint16(1+i))
+			operands[i] = c.Mem.Get(pc + uint16(1+i))
 		}
 
+		c.Regs[dat.RegNamesToNum["pc"]] += uint16(1 + size)
+
 		c.Op(op, operands)
-		c.Regs[dat.RegNamesToNum["pc"]].Set(pc+uint16(1+size))
 	}
 }
 
@@ -89,67 +90,45 @@ func (c *CPU) Op(opcode uint16, operands []uint16) {
 	case 0x00:
 	// cop (reg to copy to, reg to copy from)
 	case 0x01:
-		c.Regs[operands[0]].Set(
-			c.Regs[operands[1]].Get(),
-		)
+		c.Regs[operands[0]] = c.Regs[operands[1]]
 	// cpl (reg to copy to, value to copy)
 	case 0x02:
-		c.Regs[operands[0]].Set(operands[1])
+		c.Regs[operands[0]] = operands[1]
 	// str (reg with addr, reg with value)
 	case 0x03:
 		c.Mem.Set(
-			c.Regs[operands[0]].Get(),
-			c.Regs[operands[1]].Get(),
+			c.Regs[operands[0]],
+			c.Regs[operands[1]],
 		)
 	// ldr (reg to load to, reg with addr)
 	case 0x04:
-		c.Regs[operands[0]].Set(
-			c.Mem.Get(
-				c.Regs[operands[1]].Get(),
-			),
-		)
+		c.Regs[operands[0]] = c.Mem.Get(c.Regs[operands[1]])
 	// add (reg with value)
 	case 0x05:
-		c.Regs[dat.RegNamesToNum["ac"]].Set(
-			c.Regs[dat.RegNamesToNum["ac"]].Get() + c.Regs[operands[0]].Get(),
-		)
+		c.Regs[dat.RegNamesToNum["ac"]] = c.Regs[dat.RegNamesToNum["ac"]] + c.Regs[operands[0]]
 	// sub (reg with value)
 	case 0x06:
-		c.Regs[dat.RegNamesToNum["ac"]].Set(
-			c.Regs[dat.RegNamesToNum["ac"]].Get() + (^c.Regs[operands[0]].Get() + 1),
-		)
+		c.Regs[dat.RegNamesToNum["ac"]] = c.Regs[dat.RegNamesToNum["ac"]] + (^c.Regs[operands[0]] + 1)
 	// twc (reg to twc)
 	case 0x07:
-		c.Regs[operands[0]].Set(
-			^c.Regs[operands[0]].Get() + 1,
-		)
+		c.Regs[operands[0]] = ^c.Regs[operands[0]] + 1
 	// inc (reg to inc)
 	case 0x08:
-		c.Regs[operands[0]].Set(
-			c.Regs[operands[0]].Get() + 1,
-		)
+		c.Regs[operands[0]]++
 	// dec (reg to dec)
 	case 0x09:
-		c.Regs[operands[0]].Set(
-			c.Regs[operands[0]].Get() + (^uint16(1) + 1),
-		)
+		c.Regs[operands[0]] += (^uint16(1) + 1)
 	// mul (reg with value)
 	case 0x0a:
-		c.Regs[dat.RegNamesToNum["ac"]].Set(
-			c.Regs[dat.RegNamesToNum["ac"]].Get() * c.Regs[operands[0]].Get(),
-		)
+		c.Regs[dat.RegNamesToNum["ac"]] *= c.Regs[operands[0]]
 	// div (reg with value)
 	case 0x0b:
-		c.Regs[dat.RegNamesToNum["ac"]].Set(
-			c.Regs[dat.RegNamesToNum["ac"]].Get() % c.Regs[operands[0]].Get(),
-		)
-		c.Regs[dat.RegNamesToNum["ac"]].Set(
-			c.Regs[dat.RegNamesToNum["ac"]].Get() / c.Regs[operands[0]].Get(),
-		)
+		c.Regs[dat.RegNamesToNum["ex"]] = c.Regs[dat.RegNamesToNum["ac"]] % c.Regs[operands[0]]
+		c.Regs[dat.RegNamesToNum["ac"]] /= c.Regs[operands[0]]
 	// dvc (reg with value)
 	case 0x0c:
-		a := c.Regs[dat.RegNamesToNum["ac"]].Get()
-		b := c.Regs[operands[0]].Get()
+		a := c.Regs[dat.RegNamesToNum["ac"]]
+		b := c.Regs[operands[0]]
 		x, y := a, b
 		aSign, bSign := a>>15, b>>15
 		same := aSign == bSign
@@ -159,67 +138,45 @@ func (c *CPU) Op(opcode uint16, operands []uint16) {
 		if bSign == 1 {
 			y = ^y + 1
 		}
-		c.Regs[dat.RegNamesToNum["ex"]].Set(x % y)
+		c.Regs[dat.RegNamesToNum["ex"]] = x % y
 		if same {
-			c.Regs[dat.RegNamesToNum["ac"]].Set(x / y)
+			c.Regs[dat.RegNamesToNum["ac"]] = x / y
 		} else {
-			c.Regs[dat.RegNamesToNum["ac"]].Set(^(x / y) + 1)
+			c.Regs[dat.RegNamesToNum["ac"]] = ^(x / y) + 1
 		}
 	// xor (reg with value)
 	case 0x0d:
-		c.Regs[dat.RegNamesToNum["ac"]].Set(
-			c.Regs[dat.RegNamesToNum["ac"]].Get() ^ c.Regs[operands[0]].Get(),
-		)
+		c.Regs[dat.RegNamesToNum["ac"]] ^= c.Regs[operands[0]]
 	// and (reg with value)
 	case 0x0e:
-		c.Regs[dat.RegNamesToNum["ac"]].Set(
-			c.Regs[dat.RegNamesToNum["ac"]].Get() & c.Regs[operands[0]].Get(),
-		)
+		c.Regs[dat.RegNamesToNum["ac"]] &= c.Regs[operands[0]]
 	// orr (reg with value)
 	case 0x0f:
-		c.Regs[dat.RegNamesToNum["ac"]].Set(
-			c.Regs[dat.RegNamesToNum["ac"]].Get() | c.Regs[operands[0]].Get(),
-		)
+		c.Regs[dat.RegNamesToNum["ac"]] |= c.Regs[operands[0]]
 	// not (reg to invert)
 	case 0x10:
-		c.Regs[operands[0]].Set(
-			^c.Regs[operands[0]].Get(),
-		)
+		c.Regs[operands[0]] = ^c.Regs[operands[0]]
 	// shr (reg to shift, amount to shift)
 	case 0x11:
-		c.Regs[operands[0]].Set(
-			c.Regs[operands[0]].Get() >> operands[1],
-		)
+		c.Regs[operands[0]] >>= operands[1]
 	// shl (reg to shift, amount to shift)
 	case 0x12:
-		c.Regs[operands[0]].Set(
-			c.Regs[operands[0]].Get() << operands[1],
-		)
+		c.Regs[operands[0]] <<= operands[1]
 	// vga
 	case 0x13:
 		c.VGA.TextDraw()
 	// psh (reg with value)
 	case 0x14:
-		c.Regs[dat.RegNamesToNum["sp"]].Set(
-			c.Regs[dat.RegNamesToNum["sp"]].Get() - 1,
-		)
-		c.Mem.Set(c.Regs[dat.RegNamesToNum["sp"]].Get(), operands[0])
+		c.Regs[dat.RegNamesToNum["sp"]]--
+		c.Mem.Set(c.Regs[dat.RegNamesToNum["sp"]], operands[0])
 	// pop (reg to store in)
 	case 0x15:
-		c.Regs[operands[0]].Set(
-			c.Regs[dat.RegNamesToNum["sp"]].Get(),
-		)
-		c.Regs[dat.RegNamesToNum["sp"]].Set(
-			c.Regs[dat.RegNamesToNum["sp"]].Get() + 1,
-		)
+		c.Regs[operands[0]] = c.Mem.Get(c.Regs[dat.RegNamesToNum["sp"]])
+		c.Regs[dat.RegNamesToNum["sp"]]++
 	// ret
 	case 0x16:
-		c.Regs[dat.RegNamesToNum["pc"]].Set(
-			c.Regs[dat.RegNamesToNum["sp"]].Get(),
-		)
-		c.Regs[dat.RegNamesToNum["sp"]].Set(
-			c.Regs[dat.RegNamesToNum["sp"]].Get() + 1,
-		)
+		c.Regs[dat.RegNamesToNum["pc"]] = c.Mem.Get(c.Regs[dat.RegNamesToNum["sp"]])
+		c.Regs[dat.RegNamesToNum["sp"]]++
 		// TODO:
 		// cal
 		// cmp
@@ -235,18 +192,18 @@ func (c *CPU) Op(opcode uint16, operands []uint16) {
 // String returns a string representation of a CPU.
 func (c *CPU) String() string {
 
-	out := "Registers:"
+	out := "Memory:\n"
+	out += c.Mem.String()
+
+	out += "\nRegisters:"
 	for i := 0; i < dat.GPRNum; i++ {
-		out += fmt.Sprintf("\n%d:%s", i, c.Regs[uint16(i)])
+		out += fmt.Sprintf("\n%d:%x", i, c.Regs[uint16(i)])
 	}
 
-	out += fmt.Sprintf("\nex:%s", c.Regs[dat.RegNamesToNum["ex"]])
-	out += fmt.Sprintf("\nac:%s", c.Regs[dat.RegNamesToNum["ac"]])
-	out += fmt.Sprintf("\nsp:%s", c.Regs[dat.RegNamesToNum["sp"]])
-	out += fmt.Sprintf("\npc:%s", c.Regs[dat.RegNamesToNum["pc"]])
-
-	out += "\nMemory:\n"
-	out += c.Mem.String()
+	out += fmt.Sprintf("\nex:%x", c.Regs[dat.RegNamesToNum["ex"]])
+	out += fmt.Sprintf("\nac:%x", c.Regs[dat.RegNamesToNum["ac"]])
+	out += fmt.Sprintf("\nsp:%x", c.Regs[dat.RegNamesToNum["sp"]])
+	out += fmt.Sprintf("\npc:%x", c.Regs[dat.RegNamesToNum["pc"]])
 
 	return out
 }

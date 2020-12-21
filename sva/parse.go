@@ -224,11 +224,11 @@ func parse(lines [][]string) (svb.SVB, error) {
 
 	// Append ret instruction to main
 	currentSub.Instructions = append(currentSub.Instructions, svb.Instruction{
-		Name: "ret",
+		Name:   "ret",
 		Opcode: 0x16,
-		Size: 1,
+		Size:   1,
 	})
-	currentSub.Size += 1
+	currentSub.Size++
 
 	binary.Subroutines = append(binary.Subroutines, currentSub)
 	binary.Constants = constants

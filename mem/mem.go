@@ -23,9 +23,8 @@ func NewRAM(a AddressSpace) *RAM {
 func (m *RAM) Get(address uint16) uint16 {
 	value, exists := m.Mem[address]
 	if !exists {
-		// Because actual memory would have an arbitrary initial value, this value can be anything :)
-		m.Mem[address] = 0x1337
-		value = 0x1337
+		m.Mem[address] = 0
+		value = 0
 	}
 	return value
 }
