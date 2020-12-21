@@ -66,7 +66,7 @@ This repository contains the virtual machine and an assembler to compile program
 | `7`    | pc    | Program counter: holds the addess of the next instruction in memory to be executed       |
 | `8`    | lc    | Last counter: holds the last value of the program counter, useful for loops              |
 
-## The Simple Virtual Assembler (sva)
+## The Simple Virtual Assembler
 
 In the directory `sva` you'll find the source code for the assembler.
 
