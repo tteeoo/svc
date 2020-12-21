@@ -38,7 +38,8 @@ func main() {
 	space := program.GetProgramMem()
 	m := mem.NewRAM(space)
 	v := vga.NewVGA(m, dat.VGAOffset, dat.VGAHeight, dat.VGAWidth)
-	c := cpu.NewCPU(program.MainAddress, m, v)
+	c := cpu.NewCPU(m, v)
 
-	fmt.Println(c)
+	// Run!
+	c.Run(program.MainAddress)
 }

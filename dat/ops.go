@@ -23,6 +23,9 @@ var (
 		"shr": 0x11,
 		"shl": 0x12,
 		"vga": 0x13,
+		"psh": 0x14,
+		"pop": 0x15,
+		"ret": 0x16,
 	}
 
 	// OpCodeToName is the reverse of OpNameToCode.
@@ -51,5 +54,8 @@ var (
 		"shr": 2,
 		"shl": 2,
 		"vga": 0,
+		"psh": 1,
+		"pop": 1,
+		"ret": 0,
 	}
 )

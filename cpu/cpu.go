@@ -3,6 +3,7 @@
 package cpu
 
 import (
+	"os"
 	"fmt"
 	"github.com/tteeoo/svc/dat"
 	"github.com/tteeoo/svc/mem"
@@ -20,7 +21,7 @@ type CPU struct {
 }
 
 // NewCPU returns a pointer to a newly initialized CPU.
-func NewCPU(pc uint16, m *mem.RAM, v *vga.VGA) *CPU {
+func NewCPU(m *mem.RAM, v *vga.VGA) *CPU {
 
 	// Create registers
 	regs := make(map[uint16]*Register)
@@ -30,7 +31,6 @@ func NewCPU(pc uint16, m *mem.RAM, v *vga.VGA) *CPU {
 	for _, i := range []string{"ex", "ac", "sp", "pc"} {
 		regs[dat.RegNamesToNum[i]] = NewRegister()
 	}
-	regs[dat.RegNamesToNum["pc"]].Set(pc)
 	regs[dat.RegNamesToNum["sp"]].Set(dat.StackOffset)
 
 	return &CPU{
@@ -40,9 +40,35 @@ func NewCPU(pc uint16, m *mem.RAM, v *vga.VGA) *CPU {
 	}
 }
 
-// GetMem returns the CPU's memory device.
-func (c *CPU) GetMem() *mem.RAM {
-	return c.Mem
+// Run starts execution at the given memory address.
+func (c *CPU) Run(address uint16) {
+
+	// Push exit address onto stack
+	sp := dat.RegNamesToNum["sp"]
+	c.Regs[sp].Set(c.Regs[sp].Get() - 1)
+	c.Mem.Set(c.Regs[dat.RegNamesToNum["sp"]].Get(), 0xffff)
+
+	c.Regs[dat.RegNamesToNum["pc"]].Set(address)
+	for {
+		pc := c.Regs[dat.RegNamesToNum["pc"]].Get()
+
+		// Exit if pc is the last address
+		if pc == 0xffff {
+			os.Exit(0)
+		}
+
+		op := c.Mem.Get(pc)
+		name := dat.OpCodeToName[op]
+		size := dat.OpNameToSize[name]
+
+		operands := make([]uint16, size)
+		for i := 0; i < size; i++ {
+			operands[i] = c.Mem.Get(pc+uint16(1+i))
+		}
+
+		c.Op(op, operands)
+		c.Regs[dat.RegNamesToNum["pc"]].Set(pc+uint16(1+size))
+	}
 }
 
 // GetOp returns to opcode whose name is provided.
@@ -56,7 +82,7 @@ func (c *CPU) GetOp(name string) uint16 {
 }
 
 // Op executes an opcode with the given operands.
-func (c *CPU) Op(opcode uint16, operands []uint16) error {
+func (c *CPU) Op(opcode uint16, operands []uint16) {
 	// fmt.Printf("--> %x, %x\n", opcode, operands)
 	switch opcode {
 	// nop
@@ -172,16 +198,38 @@ func (c *CPU) Op(opcode uint16, operands []uint16) error {
 	// vga
 	case 0x13:
 		c.VGA.TextDraw()
+	// psh (reg with value)
+	case 0x14:
+		c.Regs[dat.RegNamesToNum["sp"]].Set(
+			c.Regs[dat.RegNamesToNum["sp"]].Get() - 1,
+		)
+		c.Mem.Set(c.Regs[dat.RegNamesToNum["sp"]].Get(), operands[0])
+	// pop (reg to store in)
+	case 0x15:
+		c.Regs[operands[0]].Set(
+			c.Regs[dat.RegNamesToNum["sp"]].Get(),
+		)
+		c.Regs[dat.RegNamesToNum["sp"]].Set(
+			c.Regs[dat.RegNamesToNum["sp"]].Get() + 1,
+		)
+	// ret
+	case 0x16:
+		c.Regs[dat.RegNamesToNum["pc"]].Set(
+			c.Regs[dat.RegNamesToNum["sp"]].Get(),
+		)
+		c.Regs[dat.RegNamesToNum["sp"]].Set(
+			c.Regs[dat.RegNamesToNum["sp"]].Get() + 1,
+		)
 		// TODO:
-		// psh
-		// pop
-		// jmp
+		// cal
 		// cmp
-		// jme
-		// jne
+		// cle
+		// cln
+		// jmp
+		// cle
+		// cln
 	}
 	// fmt.Println(c)
-	return nil
 }
 
 // String returns a string representation of a CPU.

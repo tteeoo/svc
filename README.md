@@ -41,6 +41,9 @@ This repository contains the virtual machine and an assembler to compile program
 | `0x11` | shr  | `register` `value to shift by`                      | Shifts the value held in a register to the right by a specified value                                                                                    |
 | `0x12` | shl  | `register` `value to shift by`                      | Shifts the value held in a register to the left by a specified value                                                                                     |
 | `0x13` | vga  |                                                     | Prints the VGA text buffer to the screen                                                                                                                 |
+| `0x14` | psh  | `register`                                          | Decreases the stack pointer and sets the top value of the stack to the value held in a register                                                          |
+| `0x15` | pop  | `register`                                          | Stores the top value of the stack in a register and increases the stack pointer                                                                          |
+| `0x16` | ret  |                                                     | Sets the program couter to the top value of the stack and increases the stack pointer                                                                    |
 
 ## CPU Registers
 

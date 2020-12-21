@@ -216,15 +216,22 @@ func parse(lines [][]string) (svb.SVB, error) {
 		}
 	}
 
-	if currentSub.Size != -1 {
-		binary.Subroutines = append(binary.Subroutines, currentSub)
-	}
-	binary.Constants = constants
-
+	// Handle main routine
 	if currentSub.Name != "main" {
 		return svb.SVB{}, fmt.Errorf("the last subroutine (%s) is not named main", currentSub.Name)
 	}
 	binary.MainAddress = currentSub.Address
+
+	// Append ret instruction to main
+	currentSub.Instructions = append(currentSub.Instructions, svb.Instruction{
+		Name: "ret",
+		Opcode: 0x16,
+		Size: 1,
+	})
+	currentSub.Size += 1
+
+	binary.Subroutines = append(binary.Subroutines, currentSub)
+	binary.Constants = constants
 
 	return binary, nil
 }
