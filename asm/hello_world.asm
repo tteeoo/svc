@@ -1,5 +1,9 @@
-; Note: I still need to make the parser check for spaces.
-text = "Hello,World!"
+; Define the text we want to print.
+; Each character will be consecutively stored in memory,
+; with the first address available via "[text]".
+; The address after the end of the string will be set to 0
+; to denote the end of the string.
+text = "Hello, World!"
 
 ; Source the print.asm file.
 . print.asm
@@ -34,14 +38,12 @@ main:
   ; Since the text we want to print is consecutively stored in memory
   ; we can just increment the address to get the next one.
   ; We also increment the number of characters printed.
-  inc aa
-  inc bb
+  inc aa, bb
 
   ; Loop back to the psh instruction if the loaded character
   ; was not the null terminator.
-  pop cc
-  gtn cc
+  pop, gtn cc
 
-  ; Draw the text-buffer.
+  ; Draw the text buffer.
   vga
 

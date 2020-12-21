@@ -9,16 +9,28 @@ import (
 func main() {
 	// Get input file
 	if len(os.Args) < 2 {
-		fmt.Printf("run like this: %s <input file> [-o <output file>]\n", os.Args[0])
+		fmt.Printf("run like this: %s <input file> [-o <output file>] [-p]\n", os.Args[0])
 		os.Exit(1)
 	}
-	inputFile := os.Args[1]
+
+	// Determine if we should output the pre-processed assembly
+	writePP := false
+	var args []string
+	for _, a := range os.Args[1:] {
+		if a != "-p" {
+			args = append(args, a)
+		} else {
+			writePP = true
+		}
+
+	}
+	inputFile := args[0]
 
 	// Get output file
 	outputFile := "./out.svb"
-	if len(os.Args) == 4 {
-		if os.Args[2] == "-o" {
-			outputFile = os.Args[3]
+	if len(args) == 3 {
+		if args[1] == "-o" {
+			outputFile = args[2]
 		}
 	}
 
@@ -34,6 +46,29 @@ func main() {
 	if err != nil {
 		fmt.Println("error pre-processing:", err)
 		os.Exit(1)
+	}
+
+	// Write pre-processed input
+	if writePP {
+		ppOut := ""
+		for _, i := range lines {
+			content := false
+			for _, j := range i {
+				if j != "" {
+					ppOut += j + " "
+					content = true
+				}
+			}
+			if content {
+				ppOut += "\n"
+			}
+		}
+
+		err = ioutil.WriteFile(outputFile + ".asm",  []byte(ppOut), 0644)
+		if err != nil {
+			fmt.Println("error writing binary:", err)
+			os.Exit(1)
+		}
 	}
 
 	// Parse input

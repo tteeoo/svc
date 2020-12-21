@@ -72,17 +72,8 @@ In the directory `sva` you'll find the source code for the assembler.
 
 It reads a rudimentary assembly language and outputs an equally simple binary format called "svb".
 
-Usage:
-```
-sva <input file> [-o output file]
-```
-
-Then, to run the assembled program, run:
-```
-svc <svb file>
-```
-
-See the ["sva" directory](https://github.com/tteeoo/svc/tree/main/sva) for more documentation, and the ["asm" directory](https://github.com/tteeoo/svc/tree/main/asm) for some example programs.
+See the ["sva" directory](https://github.com/tteeoo/svc/tree/main/sva) for more documentation on writing in the assemby language
+[and](and) using the assembler. See the ["asm" directory](https://github.com/tteeoo/svc/tree/main/asm) for some example programs.
 
 ## To Do
 
