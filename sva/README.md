@@ -4,6 +4,10 @@ The assembler for the Simple Virtual Computer.
 
 It reads a rudimentary assembly language and outputs an equally simple binary format called "svb".
 
+The syntax is a bit different than a typical x86 assembly language (partial because I don't know any "real" assembly languages very well).
+The language is also conceptually different. For example, there are no labels (to make loops you must use the `lc` register, as seen in
+[hello_world.asm](https://github.com/tteeoo/svc/blob/main/asm/hello_world.asm)), or sections.
+
 ## Usage
 
 ```
@@ -34,7 +38,7 @@ Works as if the contents of the other file were directly inserted into the curre
 This will only go one file deep. A file that is sourced cannot source another file.
 
 Examples:
-```
+```asm
 . foo.asm
 . dir/bar.asm
 . ../baz.asm
@@ -50,7 +54,7 @@ Negative integers will become their two's complement, and strings will allocate 
 This address (or the first address in the case of strings) can later be used in your program with the `[name]` syntax.
 
 Examples:
-```[asm](asm)
+```asm
 foo = 0x41
 bar = "Hello, world!"
 baz = 42
