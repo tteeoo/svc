@@ -82,14 +82,14 @@ Then, to run the assembled program, run:
 svc <svb file>
 ```
 
-See the [sva directory](https://github.com/tteeoo/svc/tree/main/sva) for more documentation, and the [asm directory](https://github.com/tteeoo/svc/tree/main/asm) for some example programs.
+See the ["sva" directory](https://github.com/tteeoo/svc/tree/main/sva) for more documentation, and the ["asm" directory](https://github.com/tteeoo/svc/tree/main/asm) for some example programs.
 
 ## To Do
 
-* Better tests
-* Keyboard input
-* Example programs and documentation.
+* Better tests (ones that actually exist).
+* Keyboard input.
 * Some sort of debugging mode.
+* More example programs and documentation.
 
 ## License
 
