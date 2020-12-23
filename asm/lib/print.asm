@@ -7,8 +7,7 @@ print_char:
   ; The address to store the character in ram should be in bb.
 
   ; Apply the colors (black background, white foreground).
-  cpl dd 0x0f00
-  orr dd
+  orr (0x0f00)
 
   ; Store the character in the text buffer.
   str bb ac
@@ -28,8 +27,7 @@ print_str:
 
   ldr ac aa
 
-  cpl dd 0
-  cmp ac dd
+  cmp ac (0)
 
   cln {print_char}
 

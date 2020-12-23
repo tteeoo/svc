@@ -28,8 +28,7 @@ main:
 
   ; Check if the accumulator is equal to 0, the "null terminator",
   ; signifying the end of a string.
-  cpl dd 0
-  cmp ac dd
+  cmp ac (0)
 
   ; Print a character if it is not the null terminator.
   ; This will call the print_char subroutine defined in the print.asm file.

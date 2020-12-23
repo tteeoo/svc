@@ -8,6 +8,83 @@ import (
 	"strings"
 )
 
+// Handle ex register expansion "ldr (0) aa" -> "cpl ex 0", "ldr ex aa"
+func registerExpansion(splitLine []string, idx int) ([][]string, error) {
+	first := []string{"cpl", "ex"}
+
+	if splitLine[idx][0] != '(' || splitLine[idx][len(splitLine[idx])-1] != ')' {
+		return [][]string{}, fmt.Errorf("invalid register expansion: %s", splitLine)
+	}
+	first = append(first, splitLine[idx][1:len(splitLine[idx])-1])
+	splitLine[idx] = "ex"
+
+	return [][]string{first, splitLine}, nil
+}
+
+// Handle double operator "aaa, bbb xx yy" -> "aaa xx yy", "bbb xx yy"
+func expandOperation(splitLine []string) [][]string {
+	first := []string{splitLine[0][:len(splitLine[0])-1]}
+	second := []string{splitLine[1]}
+
+	if len(splitLine) > 2 {
+		for _, and := range splitLine[2:] {
+			first = append(first, and)
+			second = append(second, and)
+		}
+	}
+
+	return [][]string{first, second}
+}
+
+// Handle double operands "aaa bb xx, yy zz" -> "aaa bb xx", "aaa yy zz"
+func expandOperand(splitLine []string) ([][]string, error) {
+	first := []string{splitLine[0]}
+	second := []string{splitLine[0]}
+
+	if len(splitLine) < 3 {
+		return [][]string{}, fmt.Errorf("invalid instruction expansion: %s", splitLine)
+	}
+	onFirst := true
+	for _, and := range splitLine[1:] {
+		if !onFirst {
+			second = append(second, and)
+			continue
+		}
+		if and[len(and)-1] != ',' {
+			first = append(first, and)
+			continue
+		}
+		first = append(first, and[:len(and)-1])
+		onFirst = false
+	}
+
+	return [][]string{first, second}, nil
+}
+
+// returns an expansion if exists, else returns the original instruction
+func detectExpansion(splitLine []string) ([][]string, error) {
+	for i, s := range splitLine {
+		for j, c := range s {
+			if c == '=' {
+				return [][]string{splitLine}, nil
+			}
+			if c == '(' && j == 0 && i != 0 && len(s) > 1 {
+				return registerExpansion(splitLine, i)
+			}
+			if c == ',' {
+				if len(splitLine) < 2 {
+					return [][]string{}, fmt.Errorf("invalid instruction expansion: %s", splitLine)
+				}
+				if i == 0 {
+					return expandOperation(splitLine), nil
+				}
+				return expandOperand(splitLine)
+			}
+		}
+	}
+	return [][]string{splitLine}, nil
+}
+
 // preProcess will preProcess an assembly file.
 // It will remove comments and expand file sources.
 func preProcess(b []byte, allowSource bool) ([][]string, error) {
@@ -46,116 +123,54 @@ func preProcess(b []byte, allowSource bool) ([][]string, error) {
 			}
 		}
 
-		// Detect instruction expansions
-		doubleOp := false
-		doubleAnd := false
-		isConstant := false
-		for i, s := range splitLine {
-			for _, c := range s {
-				if c == '=' {
-					isConstant = true
-				} else if c == ',' {
-					if len(splitLine) < 2 || doubleAnd || doubleOp {
-						return [][]string{}, fmt.Errorf("invalid instruction expansion: %s\n", splitLine)
-					}
-					if !isConstant {
-						if i == 0 {
-							doubleOp = true
-						} else {
-							doubleAnd = true
-						}
-					}
-				}
+		// Detect expansions
+		expandedLines, err := detectExpansion(splitLine)
+		if err != nil {
+			return [][]string{}, err
+		}
+		if len(expandedLines) != 1 {
+			for _, l := range expandedLines {
+				lines = append(lines, l)
 			}
+			continue
 		}
 
-		// Handle double operator (aaa, bbb xx yy) -> (aaa xx yy), (bbb xx yy)
-		if doubleOp {
-			first := []string{splitLine[0][:len(splitLine[0])-1]}
-			second := []string{splitLine[1]}
-
-			if len(splitLine) > 2 {
-				for _, and := range splitLine[2:] {
-					first = append(first, and)
-					second = append(second, and)
-				}
-			}
-
-			lines = append(append(lines, first), second)
-			continue
-
-		} else if doubleAnd {
-			// Handle double operands (aaa bb xx, yy zz) -> (aaa bb xx), (aaa yy zz)
-			first := []string{splitLine[0]}
-			second := []string{splitLine[0]}
-
-			if len(splitLine) < 3 {
-				return [][]string{}, fmt.Errorf("invalid instruction expansion: %s\n", splitLine)
-			}
-			onFirst := true
-			for _, and := range splitLine[1:] {
-				if onFirst {
-					if and[len(and)-1] == ',' {
-						first = append(first, and[:len(and)-1])
-						onFirst = false
-					} else {
-						first = append(first, and)
-					}
-				} else {
-					second = append(second, and)
-				}
-			}
-
-			lines = append(append(lines, first), second)
+		// Normal instruction
+		if len(splitLine) != 2 || splitLine[0] != "." {
+			lines = append(lines, splitLine)
 			continue
 		}
 
 		// Handle file sourcing
-		if len(splitLine) == 2 && splitLine[0] == "." {
-			if allowSource {
-				if path.IsAbs(splitLine[1]) {
+		if !allowSource {
+			return [][]string{}, fmt.Errorf("cannot recursively source files (attempting to source %s)", splitLine[1])
+		}
+		var fb []byte
 
-					// Handle absolute path
-					fb, err := ioutil.ReadFile(splitLine[1])
-					if err != nil {
-						return [][]string{}, err
-					}
-
-					// Append processed lines
-					flines, err := preProcess(fb, false)
-					if err != nil {
-						return [][]string{}, err
-					}
-					lines = append(lines, flines...)
-				} else {
-
-					// Handle relative path
-					wd, err := os.Getwd()
-					if err != nil {
-						return [][]string{}, err
-					}
-					fb, err := ioutil.ReadFile(path.Join(wd, splitLine[1]))
-					if err != nil {
-						return [][]string{}, err
-					}
-
-					// Append processed lines
-					flines, err := preProcess(fb, false)
-					if err != nil {
-						return [][]string{}, err
-					}
-					lines = append(lines, flines...)
-				}
-			} else {
-				return [][]string{},
-					fmt.Errorf(
-						"cannot recursively source files (attempting to source %s)",
-						splitLine[1],
-					)
+		// Handle absolute path
+		if path.IsAbs(splitLine[1]) {
+			fb, err = ioutil.ReadFile(splitLine[1])
+			if err != nil {
+				return [][]string{}, err
 			}
 		} else {
-			lines = append(lines, splitLine)
+			// Handle relative path
+			wd, err := os.Getwd()
+			if err != nil {
+				return [][]string{}, err
+			}
+			fb, err = ioutil.ReadFile(path.Join(wd, splitLine[1]))
+			if err != nil {
+				return [][]string{}, err
+			}
 		}
+
+		// Append lines from file
+		flines, err := preProcess(fb, false)
+		if err != nil {
+			return [][]string{}, err
+		}
+		lines = append(lines, flines...)
 	}
 
 	return lines, nil

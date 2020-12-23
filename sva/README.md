@@ -77,10 +77,11 @@ cpl dd -2   ; copies -2 into register 3
 cmp ac dd   ; compares the value of the accumulator and dd
 ```
 
-###### Instruction expansions
-An instruction expansion is syntactic sugar, allowing two instructions to be defined with one line.
-They can take two forms: either mapping one operation to two sets of operands, or mapping two operations to one set of operands.
+###### Expansions
+Expansions are syntactic sugar, allowing two instructions to be defined with one line.
+There are three different types.
 
+One maps a single operation to two sets of operands. 
 For example, this code:
 ```asm
 inc aa, bb
@@ -91,7 +92,8 @@ inc aa
 inc bb
 ```
 
-And this code:
+Another maps two operations to one set of operands.
+This code:
 ```asm
 inc, add aa
 ```
@@ -99,6 +101,16 @@ Will expand to:
 ```asm
 inc aa
 add aa
+```
+
+The last kind will take a value from inside some parenthesis, copy it into `ex`, and replace the value with "ex", so this code:
+```asm
+orr (0x0f00)
+```
+Expands to:
+```asm
+cpl ex 0x0f00
+orr ex
 ```
 
 #### Defines a subroutine
@@ -111,20 +123,20 @@ Every program needs a `main` subroutine. This is a special subroutine that is co
 
 Examples:
 ```asm
-; prints "A" if 0xff equals 0xff
+; prints "A" if 5 + 1 equals 6
 foo = "A"
 
 print:
-  ldr ac [foo]  ; loads "A" into the accumulator
-  orr 0x0f00    ; applies black background and white foreground colors to the accumulator
-  cpl bb 0      ; copies 0 into bb
-  str bb ac     ; stores the value held in the accumulator at the first address in memory
-  vga, ret      ; draws the text buffer, printing "A" with white text and black background
+  ldr ac ([foo]) ; loads "A" into the accumulator
+  orr (0x0f00)   ; applies black background and white foreground colors to the accumulator
+  str (0) ac     ; stores the value held in the accumulator at the first address in memory
+  vga, ret       ; draws the text buffer, printing "A" with white text and black background
   
 main:
-  cpl cc 0xff, aa 0xff ; copies 0xff into the accumulator and aa
-  cmp cc aa            ; compares the value of cc and aa
-  cle {print}          ; calls the print subroutine if 0xff equals 0xff
+  cpl ac 1    ; copies 1 into the accumulator
+  add (5)     ; adds 5 to the accumulator
+  cmp ac (6)  ; compares the value of the accumulator and 6
+  cle {print} ; calls the print subroutine if the last cmp was equal
 ```
 
 ## The Simple Virtual Binary Format

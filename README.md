@@ -54,17 +54,18 @@ This repository contains the virtual machine and an assembler to compile program
 
 ## CPU Registers
 
-| Number | Alias | Purpose                                                                                  |
-| ------ | ----- | -------                                                                                  |
-| `0`    | aa    | General purpose: used for whatever your program desires                                  |
-| `1`    | bb    | General purpose                                                                          |
-| `2`    | cc    | General purpose                                                                          |
-| `3`    | dd    | General purpose                                                                          |
-| `4`    | ex    | Extra: holds the output of miscellaneous instructions, or extra arithmetic output values |
-| `5`    | ac    | Accumulator: holds the output of most arithmetic operations                              |
-| `6`    | sp    | Stack pointer: holds the address of the top location in memory of the stack              |
-| `7`    | pc    | Program counter: holds the addess of the next instruction in memory to be executed       |
-| `8`    | lc    | Last counter: holds the last value of the program counter, useful for loops              |
+| Number | Alias | Purpose                                                                                                     |
+| ------ | ----- | -------                                                                                                     |
+| `0`    | aa    | General purpose: used for whatever your program desires                                                     |
+| `1`    | bb    | General purpose                                                                                             |
+| `2`    | cc    | General purpose                                                                                             |
+| `3`    | dd    | General purpose                                                                                             |
+| `4`    | ex    | Extra: holds extra arithmetic output values, used for register expansions (`(value)` syntax)                |
+| `5`    | ac    | Accumulator: holds the output of most arithmetic operations                                                 |
+| `6`    | sp    | Stack pointer: holds the address of the top location in memory of the stack                                 |
+| `7`    | pc    | Program counter: holds the addess of the next instruction in memory to be executed                          |
+| `8`    | lc    | Last counter: holds the last value of the program counter, useful for loops                                 |
+| `9`    | bi    | Boolean index: set to `0xffff` if the last cmp was equal, else `0xfffe`                                     |
 
 ## The Simple Virtual Assembler
 

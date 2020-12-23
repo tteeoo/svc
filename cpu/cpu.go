@@ -177,20 +177,20 @@ func (c *CPU) Op(opcode uint16, operands []uint16) {
 	// cmp (register, register)
 	case 0x18:
 		if c.Regs[operands[0]] == c.Regs[operands[1]] {
-			c.Regs[dat.RegNamesToNum["ex"]] = 0xffff
+			c.Regs[dat.RegNamesToNum["bi"]] = 0xffff
 		} else {
-			c.Regs[dat.RegNamesToNum["ex"]] = 0xfffe
+			c.Regs[dat.RegNamesToNum["bi"]] = 0xfffe
 		}
 	// cle (address to jump to)
 	case 0x19:
-		if c.Regs[dat.RegNamesToNum["ex"]] == 0xffff {
+		if c.Regs[dat.RegNamesToNum["bi"]] == 0xffff {
 			c.Regs[dat.RegNamesToNum["sp"]]--
 			c.Mem.Set(c.Regs[dat.RegNamesToNum["sp"]], c.Regs[dat.RegNamesToNum["pc"]])
 			c.Regs[dat.RegNamesToNum["pc"]] = operands[0]
 		}
 	// cln (address to jump to)
 	case 0x1a:
-		if c.Regs[dat.RegNamesToNum["ex"]] == 0xfffe {
+		if c.Regs[dat.RegNamesToNum["bi"]] == 0xfffe {
 			c.Regs[dat.RegNamesToNum["sp"]]--
 			c.Mem.Set(c.Regs[dat.RegNamesToNum["sp"]], c.Regs[dat.RegNamesToNum["pc"]])
 			c.Regs[dat.RegNamesToNum["pc"]] = operands[0]
@@ -200,12 +200,12 @@ func (c *CPU) Op(opcode uint16, operands []uint16) {
 		c.Regs[dat.RegNamesToNum["pc"]] = c.Regs[operands[0]]
 	// gte (register holding address to jump to)
 	case 0x1c:
-		if c.Regs[dat.RegNamesToNum["ex"]] == 0xffff {
+		if c.Regs[dat.RegNamesToNum["bi"]] == 0xffff {
 			c.Regs[dat.RegNamesToNum["pc"]] = c.Regs[operands[0]]
 		}
 	// gtn (register holding address to jump to)
 	case 0x1d:
-		if c.Regs[dat.RegNamesToNum["ex"]] == 0xfffe {
+		if c.Regs[dat.RegNamesToNum["bi"]] == 0xfffe {
 			c.Regs[dat.RegNamesToNum["pc"]] = c.Regs[operands[0]]
 		}
 	}

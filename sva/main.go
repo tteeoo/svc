@@ -64,7 +64,7 @@ func main() {
 			}
 		}
 
-		err = ioutil.WriteFile(outputFile + ".asm",  []byte(ppOut), 0644)
+		err = ioutil.WriteFile(outputFile+".asm", []byte(ppOut), 0644)
 		if err != nil {
 			fmt.Println("error writing binary:", err)
 			os.Exit(1)
