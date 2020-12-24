@@ -78,17 +78,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	// fmt.Printf("%+v\n", svbStruct)
-
-	// Parse binary
-	out, err := svbStruct.Bytes()
-	if err != nil {
-		fmt.Println("error parsing binary:", err)
-		os.Exit(1)
-	}
-
 	// Write binary
-	err = ioutil.WriteFile(outputFile, out, 0644)
+	err = ioutil.WriteFile(outputFile, svbStruct.Bytes(), 0644)
 	if err != nil {
 		fmt.Println("error writing binary:", err)
 		os.Exit(1)

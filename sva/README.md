@@ -139,6 +139,3 @@ main:
   cle {print} ; calls the print subroutine if the last cmp was equal
 ```
 
-## The Simple Virtual Binary Format
-
-To be written.

@@ -133,7 +133,7 @@ func parse(lines [][]string) (svb.SVB, error) {
 			}
 			if currentSub.Size != -1 {
 				binary.Subroutines = append(binary.Subroutines, currentSub)
-				address += uint16(currentSub.Size)
+				address += uint16(currentSub.Size) + 1
 			}
 
 			subs[name] = address
