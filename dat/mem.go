@@ -13,7 +13,10 @@ var (
 	// ProgramOffset is the offset that the program is stored at in memory.
 	ProgramOffset = uint16(0x900)
 
+	// HeapOffset is the offset that the heap is stored at in memory, changed at runtime.
+	HeapOffset = ProgramOffset
+
 	// StackOffset is the offset that the stack is stored at in memory.
 	// Note that the stack counts down.
-	StackOffset = uint16(0x900)
+	StackOffset = ProgramOffset
 )

@@ -40,6 +40,9 @@ func main() {
 	v := vga.NewVGA(m, dat.VGAOffset, dat.VGAHeight, dat.VGAWidth)
 	c := cpu.NewCPU(m, v)
 
+	// Calculate heap offset
+	dat.HeapOffset += program.Size()
+
 	// Run!
 	c.Run(program.MainAddress)
 }

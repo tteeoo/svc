@@ -9,10 +9,7 @@ import (
 func (s SVB) Bytes() []byte {
 
 	// Calculate length
-	l := len(s.Constants) + len(s.Subroutines)
-	for _, i := range s.Subroutines {
-		l += i.Size
-	}
+	l := int(s.Size()) + len(s.Subroutines)
 
 	// Add constants
 	u := make([]uint16, l)
@@ -21,7 +18,7 @@ func (s SVB) Bytes() []byte {
 	}
 
 	// Add subroutines
-	i := len(s.Constants)
+	i := uint16(len(s.Constants))
 	for _, sub := range s.Subroutines {
 		u[i] = 0xffff
 		opi := i + 1
@@ -33,7 +30,7 @@ func (s SVB) Bytes() []byte {
 				opi++
 			}
 		}
-		i += sub.Size + 1
+		i += sub.Size() + 1
 	}
 
 	// Convert uint16 to binary

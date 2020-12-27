@@ -40,12 +40,28 @@ func NewCPU(m *mem.RAM, v *vga.VGA) *CPU {
 // Run starts execution at the given memory address.
 func (c *CPU) Run(address uint16) {
 
+	// Put command-line args into heap
+	if len(os.Args) > 2 {
+		i := dat.HeapOffset
+		for _, str := range os.Args[2:] {
+			for _, char := range str {
+				c.Mem.Set(i, uint16(char))
+				i++
+			}
+			c.Mem.Set(i, 0)
+			i++
+		}
+	}
+
 	// Push exit address onto stack
 	sp := dat.RegNamesToNum["sp"]
 	c.Regs[sp]--
 	c.Mem.Set(c.Regs[sp], 0xffff)
 
+	// Set the program counter
 	c.Regs[dat.RegNamesToNum["pc"]] = address
+
+	// Enter the execution loop
 	for {
 		pc := c.Regs[dat.RegNamesToNum["pc"]]
 
@@ -59,8 +75,8 @@ func (c *CPU) Run(address uint16) {
 		name := dat.OpCodeToName[op]
 		size := dat.OpNameToSize[name]
 		operands := make([]uint16, size)
-		for i := 0; i < size; i++ {
-			operands[i] = c.Mem.Get(pc + uint16(1+i))
+		for i := uint16(0); i < size; i++ {
+			operands[i] = c.Mem.Get(pc + (1 + i))
 		}
 
 		// Set the lc register
@@ -76,7 +92,6 @@ func (c *CPU) Run(address uint16) {
 
 // Op executes an opcode with the given operands.
 func (c *CPU) Op(opcode uint16, operands []uint16) {
-	// fmt.Printf("--> %x, %x\n", opcode, operands)
 	switch opcode {
 	// nop
 	case 0x00:

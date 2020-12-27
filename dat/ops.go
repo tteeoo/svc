@@ -40,7 +40,7 @@ var (
 	OpCodeToName = make(map[uint16]string)
 
 	// OpNameToSize maps names to the instruction size.
-	OpNameToSize = map[string]int{
+	OpNameToSize = map[string]uint16{
 		"nop": 0,
 		"cop": 2,
 		"cpl": 2,

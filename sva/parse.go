@@ -57,7 +57,7 @@ func parse(lines [][]string) (svb.SVB, error) {
 	subs := make(map[string]uint16)
 	address := dat.ProgramOffset
 	constants := []svb.Constant{}
-	currentSub := svb.Subroutine{Size: -1}
+	currentSub := svb.Subroutine{}
 	binary := svb.SVB{}
 
 	// Iterate lines
@@ -65,7 +65,7 @@ func parse(lines [][]string) (svb.SVB, error) {
 
 		// Handle constants
 		if (len(splitLine) == 3) && (splitLine[1] == "=") {
-			if currentSub.Size != -1 {
+			if currentSub.Name != "" {
 				return svb.SVB{},
 					fmt.Errorf("you cannot define a constant inside of a subroutine (%s is in %s)",
 						splitLine,
@@ -131,9 +131,9 @@ func parse(lines [][]string) (svb.SVB, error) {
 			if _, exists := subs[name]; exists {
 				return svb.SVB{}, fmt.Errorf("subroutine \"%s\" already exists", name)
 			}
-			if currentSub.Size != -1 {
+			if currentSub.Name != "" {
 				binary.Subroutines = append(binary.Subroutines, currentSub)
-				address += uint16(currentSub.Size) + 1
+				address += currentSub.Size() + 1
 			}
 
 			subs[name] = address
@@ -192,7 +192,7 @@ func parse(lines [][]string) (svb.SVB, error) {
 
 			// Check that the right number of operands are provided
 			size := dat.OpNameToSize[splitLine[0]]
-			if len(operands) != size {
+			if len(operands) != int(size) {
 				return svb.SVB{},
 					fmt.Errorf("operation %s expected %d operands, but received %d",
 						splitLine,
@@ -202,7 +202,7 @@ func parse(lines [][]string) (svb.SVB, error) {
 			}
 
 			// Check to make sure instruction is in a defined subroutine
-			if currentSub.Size == -1 {
+			if currentSub.Name == "" {
 				return svb.SVB{}, fmt.Errorf("instruction %s used outside of a subroutine", splitLine)
 			}
 
@@ -210,9 +210,7 @@ func parse(lines [][]string) (svb.SVB, error) {
 				Name:     splitLine[0],
 				Opcode:   code,
 				Operands: operands,
-				Size:     size + 1,
 			})
-			currentSub.Size += size + 1
 		}
 	}
 
@@ -226,9 +224,7 @@ func parse(lines [][]string) (svb.SVB, error) {
 	currentSub.Instructions = append(currentSub.Instructions, svb.Instruction{
 		Name:   "ret",
 		Opcode: 0x16,
-		Size:   1,
 	})
-	currentSub.Size++
 
 	binary.Subroutines = append(binary.Subroutines, currentSub)
 	binary.Constants = constants

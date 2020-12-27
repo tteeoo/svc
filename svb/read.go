@@ -22,7 +22,6 @@ func ParseBinary(b []byte) (SVB, error) {
 	for i := 0; i < cap(doubled); i++ {
 		doubled[i] = BytesToUint(r[2*i : 2*i+2])
 	}
-	fmt.Printf("%x\n", doubled)
 
 	// Parse out constants
 	consts := []Constant{}
@@ -42,8 +41,8 @@ func ParseBinary(b []byte) (SVB, error) {
 
 	// Parse out subroutines
 	subs := []Subroutine{}
-	idx := 0
-	for idx < len(bSubs) {
+	idx := uint16(0)
+	for int(idx) < len(bSubs) {
 
 		// Initialize subroutine data
 		ints := []Instruction{}
@@ -54,17 +53,17 @@ func ParseBinary(b []byte) (SVB, error) {
 
 			// Get opcode and opname
 			op := bSubs[opIdx]
-			size := 0
+			opSize := uint16(0)
 			opName, exists := dat.OpCodeToName[op]
 			if exists {
-				size = dat.OpNameToSize[opName]
+				opSize = dat.OpNameToSize[opName]
 			} else {
 				return SVB{}, fmt.Errorf("svb is invalid (opcode 0x%x does not exist)", op)
 			}
 
 			// Parse out operands
 			operands := []uint16{}
-			for _, and := range bSubs[opIdx+1 : opIdx+size+1] {
+			for _, and := range bSubs[opIdx+1 : opIdx+opSize+1] {
 				operands = append(operands, and)
 			}
 
@@ -72,30 +71,23 @@ func ParseBinary(b []byte) (SVB, error) {
 				Name:     opName,
 				Opcode:   op,
 				Operands: operands,
-				Size:     size + 1,
 			})
 
 			// Exit if opIdx is 0xffff, else continue parsing next int
-			if (len(bSubs) <= opIdx+size+1) || (bSubs[opIdx+size+1] == 0xffff) {
+			if (len(bSubs) <= int(opIdx+opSize+1)) || (bSubs[opIdx+opSize+1] == 0xffff) {
 				break
 			} else {
-				opIdx += size + 1
+				opIdx += opSize + 1
 			}
 		}
 
-		// Get size
-		size := 0
-		for _, i := range ints {
-			size += i.Size
-		}
-
-		subs = append(subs, Subroutine{
+		currentSub := Subroutine{
 			Address:      a,
 			Instructions: ints,
-			Size:         size,
-		})
-		idx += size + 1
-		a += uint16(idx)
+		}
+		subs = append(subs, currentSub)
+		idx += currentSub.Size() + 1
+		a += currentSub.Size()
 	}
 
 	return SVB{
