@@ -28,7 +28,7 @@ func NewCPU(m *mem.RAM, v *vga.VGA) *CPU {
 	for _, n := range dat.RegNamesToNum {
 		regs[n] = 0
 	}
-	regs[dat.RegNamesToNum["sp"]] = dat.StackOffset
+	regs[dat.RegNamesToNum["sp"]] = m.StackMax
 
 	return &CPU{
 		Mem:  m,
@@ -42,7 +42,7 @@ func (c *CPU) Run(address uint16) {
 
 	// Put command-line args into heap
 	if len(os.Args) > 2 {
-		i := dat.HeapOffset
+		i := c.Mem.HeapOffset
 		for _, str := range os.Args[2:] {
 			for _, char := range str {
 				c.Mem.Set(i, uint16(char))

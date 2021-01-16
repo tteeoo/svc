@@ -11,38 +11,29 @@ import (
 type VGA struct {
 	// Mem is the memory device to read from.
 	Mem *mem.RAM
-	// TextStart is the address to start reading from in memory.
-	TextStart uint16
-	// TextHeight is the height of the text-buffer
-	TextHeight int
-	// TextWidth is the width of the text-buffer
-	TextWidth int
 	// LastBuffer stores the last rendered buffer split into lines.
 	LastBuffer []string
 }
 
 // NewVGA returns a pointer to a newly initialized VGA.
-func NewVGA(m *mem.RAM, start uint16, h, w int) *VGA {
+func NewVGA(m *mem.RAM) *VGA {
 	return &VGA{
 		LastBuffer: []string{},
 		Mem:        m,
-		TextStart:  start,
-		TextHeight: h,
-		TextWidth:  w,
 	}
 }
 
 // TextDraw reads from memory and prints out the text-buffer.
 func (v *VGA) TextDraw() {
 	// Initialize
-	tb := make([][][2]byte, v.TextHeight)
+	tb := make([][][2]byte, v.Mem.VGAHeight)
 	for i := range tb {
-		tb[i] = make([][2]byte, v.TextWidth)
+		tb[i] = make([][2]byte, v.Mem.VGAWidth)
 	}
 	// Populate
 	a := uint16(0)
-	for i := 0; i < v.TextHeight; i++ {
-		for j := 0; j < v.TextWidth; j++ {
+	for i := 0; i < int(v.Mem.VGAHeight); i++ {
+		for j := 0; j < int(v.Mem.VGAWidth); j++ {
 			b := v.Mem.Get(a)
 			tb[i][j] = [2]byte{
 				byte(b >> 8),
@@ -161,8 +152,8 @@ func (v *VGA) TextDraw() {
 		line = i + 1
 	}
 	final := ""
-	if v.TextHeight-line > 0 {
-		final = fmt.Sprintf("\033[%dB", v.TextHeight-line)
+	if int(v.Mem.VGAHeight)-line > 0 {
+		final = fmt.Sprintf("\033[%dB", int(v.Mem.VGAHeight)-line)
 	}
 	print(realOut + final)
 }

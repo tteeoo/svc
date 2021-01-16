@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/tteeoo/svc/cpu"
-	"github.com/tteeoo/svc/dat"
 	"github.com/tteeoo/svc/mem"
 	"github.com/tteeoo/svc/svb"
 	"github.com/tteeoo/svc/vga"
@@ -27,21 +26,22 @@ func main() {
 		os.Exit(1)
 	}
 
+	m := mem.NewRAM(mem.AddressSpace{}, 80, 25)
+	v := vga.NewVGA(m)
+	c := cpu.NewCPU(m, v)
+
 	// Parse program
-	program, err := svb.ParseBinary(b)
+	program, err := svb.ParseBinary(c, b)
 	if err != nil {
 		fmt.Println("error parsing program file:", err)
 		os.Exit(1)
 	}
 
-	// Initialize CPU
-	space := program.GetProgramMem()
-	m := mem.NewRAM(space)
-	v := vga.NewVGA(m, dat.VGAOffset, dat.VGAHeight, dat.VGAWidth)
-	c := cpu.NewCPU(m, v)
+	// Load program into memory
+	m.Mem = program.GetProgramMem()
 
 	// Calculate heap offset
-	dat.HeapOffset += program.Size()
+	m.HeapOffset += program.Size()
 
 	// Run!
 	c.Run(program.MainAddress)

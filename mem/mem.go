@@ -11,12 +11,28 @@ type AddressSpace map[uint16]uint16
 
 // RAM represents 128K of word-based memory (64K addresses).
 type RAM struct {
-	Mem AddressSpace
+	Mem           AddressSpace
+	VGAOffset     uint16
+	VGAWidth      uint16
+	VGAHeight     uint16
+	StackMin      uint16
+	StackMax      uint16
+	ProgramOffset uint16
+	HeapOffset    uint16
 }
 
 // NewRAM returns a pointer to a newly initialized RAM.
-func NewRAM(a AddressSpace) *RAM {
-	return &RAM{Mem: a}
+func NewRAM(a AddressSpace, vw uint16, vh uint16) *RAM {
+	return &RAM{
+		Mem:           a,
+		VGAOffset:     0,
+		VGAHeight:     vh,
+		VGAWidth:      vw,
+		StackMin:      (vh * vw) + 1,
+		StackMax:      (vh * vw) + 303,
+		ProgramOffset: (vh * vw) + 304,
+		HeapOffset:    (vh * vw) + 304,
+	}
 }
 
 // Get gets the value stored at a specified address.

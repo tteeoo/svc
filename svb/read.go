@@ -2,11 +2,12 @@ package svb
 
 import (
 	"fmt"
+	"github.com/tteeoo/svc/cpu"
 	"github.com/tteeoo/svc/dat"
 )
 
 // ParseBinary deserializes an SVB.
-func ParseBinary(b []byte) (SVB, error) {
+func ParseBinary(c *cpu.CPU, b []byte) (SVB, error) {
 	if len(b) < 8 {
 		return SVB{}, fmt.Errorf("file is invalid (smaller than 8 bytes)")
 	}
@@ -26,7 +27,7 @@ func ParseBinary(b []byte) (SVB, error) {
 	// Parse out constants
 	consts := []Constant{}
 	bSubs := []uint16{}
-	a := dat.ProgramOffset
+	a := c.Mem.ProgramOffset
 	for i := 0; i < len(r); i++ {
 		if doubled[i] == 0xffff {
 			bSubs = doubled[i:]

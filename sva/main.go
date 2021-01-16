@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/tteeoo/svc/cpu"
+	"github.com/tteeoo/svc/mem"
+	"github.com/tteeoo/svc/vga"
 	"io/ioutil"
 	"os"
 )
@@ -71,8 +74,13 @@ func main() {
 		}
 	}
 
+	// Create CPU
+	m := mem.NewRAM(mem.AddressSpace{}, 80, 25)
+	v := vga.NewVGA(m)
+	c := cpu.NewCPU(m, v)
+
 	// Parse input
-	svbStruct, err := parse(lines)
+	svbStruct, err := parse(c, lines)
 	if err != nil {
 		fmt.Println("error parsing:", err)
 		os.Exit(1)

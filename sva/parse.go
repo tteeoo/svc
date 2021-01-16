@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/hex"
 	"fmt"
+	"github.com/tteeoo/svc/cpu"
 	"github.com/tteeoo/svc/dat"
 	"github.com/tteeoo/svc/svb"
 	"strconv"
@@ -51,11 +52,11 @@ func parseNum(s string) (uint16, error) {
 }
 
 // parse will parse a pre-processed input file into an SVB struct.
-func parse(lines [][]string) (svb.SVB, error) {
+func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 
 	vars := make(map[string]uint16)
 	subs := make(map[string]uint16)
-	address := dat.ProgramOffset
+	address := c.Mem.ProgramOffset
 	constants := []svb.Constant{}
 	currentSub := svb.Subroutine{}
 	binary := svb.SVB{}
