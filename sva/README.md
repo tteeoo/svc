@@ -5,7 +5,7 @@ The assembler for the Simple Virtual Computer.
 It reads a rudimentary assembly language and outputs an equally simple binary format called "svb".
 
 The syntax is a bit different than a typical x86 assembly language (partial because I don't know any "real" assembly languages very well).
-The language is also conceptually different. For example, there are no labels (to make loops you must use the `lc` register, as seen in
+The language is also conceptually different. For example, there are no labels (to make loops, you must use the `lc` register, as seen in
 [hello_world.asm](https://github.com/tteeoo/svc/blob/main/asm/hello_world.asm)), or sections.
 
 ## Usage
@@ -15,8 +15,8 @@ sva <input file> [-o <output file>] [-p]
 ```
 `<output file>` will default to `./out.svb`.
 
-The `-p` option will write the pre-processed assembly to `<output file>.asm`.
-Pre-processing includes stripping trailing whitespace and comments, sourcing files, and expanding instructions.
+The `-p` option will write the preprocessed assembly to `<output file>.asm`.
+Preprocessing includes stripping trailing whitespace and comments, sourcing files, and expanding instructions.
 It can be useful for debugging.
 
 To execute the assembled program, run:
@@ -65,7 +65,7 @@ qux = -1337
 ```
 <name> <operands>...
 ```
-Refer to the main README file to view a table of instuction names their operands.
+Refer to the main README file to view a table of instruction names their operands.
 Operands can be a hex value, positive/negative integer, a register alias (see main README as well), constant address (`[name]`), or a subroutine address (`{name}`).
 
 Examples:
@@ -119,7 +119,7 @@ orr ex
 ```
 This will define a new subroutine with all of the instructions below it, until the next one is defined.
 Subroutines can be used by call instructions (`cal`, `cle`, `cln`) with the `{name}` syntax.
-Every program needs a `main` subroutine. This is a special subroutine that is compiled so that it is the entrypoint to your program (where the CPU starts reading).
+Every program needs a `main` subroutine. This is a special subroutine that is compiled so that it is the entry point to your program (where the CPU starts reading).
 
 Examples:
 ```asm

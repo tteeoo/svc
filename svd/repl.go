@@ -78,6 +78,7 @@ func repl(c *cpu.CPU, address uint16) {
 	// Set the program counter
 	c.Regs[dat.RegNamesToNum["pc"]] = address
 	fmt.Println(color(fmt.Sprintf("program counter set to %x", address), "32;1"))
+	fmt.Println("run `h` for help")
 
 	// Enter the execution loop
 	var cycles int
@@ -154,7 +155,7 @@ func repl(c *cpu.CPU, address uint16) {
 				if len(memRange) == 1 {
 					value, err := parseHex(memRange[0])
 					if err != nil {
-						fmt.Println("invalid key")
+						fmt.Println("invalid address")
 						continue
 					}
 					fmt.Println(
@@ -202,7 +203,7 @@ func repl(c *cpu.CPU, address uint16) {
 				// Set memory
 				key, err := parseHex(command[1])
 				if err != nil {
-					fmt.Println("invalid key")
+					fmt.Println("invalid address")
 					continue
 				}
 				value, err := parseHex(command[2])
@@ -222,6 +223,16 @@ func repl(c *cpu.CPU, address uint16) {
 			}
 		case "n":
 			fmt.Println(color(fmt.Sprintf("%d", cycles), "34;1"))
+		case "h", "?":
+			fmt.Println("h      print this help message")
+			fmt.Println("n      print the number of clock cycles executed")
+			fmt.Println("<num>  execute a number of instructions")
+			fmt.Println("c                print cpu registers")
+			fmt.Println("c <reg> <value>  set cpu register")
+			fmt.Println("m                 print the sections of memory")
+			fmt.Println("m <addr>          print memory address")
+			fmt.Println("m <addr>-<addr>   print range of memory")
+			fmt.Println("m <addr> <value>  set memory address")
 		default:
 			// Try number
 			if len(command) == 1 {

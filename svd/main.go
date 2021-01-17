@@ -31,7 +31,7 @@ func main() {
 	c := cpu.NewCPU(m, v)
 
 	// Parse program
-	fmt.Println("simple virtual debugger: alpha")
+	fmt.Println("simple virtual debugger version alpha")
 	fmt.Printf("parsing file: [%s]... ", os.Args[1])
 	program, err := svb.ParseBinary(c, b)
 	if err != nil {

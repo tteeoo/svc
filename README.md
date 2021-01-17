@@ -7,7 +7,7 @@ A 16-bit virtual machine written in Go.
 It uses word-based memory, where each memory address maps to a word-length value.
 This means that while there are only 65,536 memory addresses,
 it technically has 128K of memory since each address points to a 16-bit value instead of a byte.
-The reasoning for this is simple: simplicity. Most modern computer systems use bytes because they can be more flexible and effecient.
+The reasoning for this is simple: simplicity. Most modern computer systems use bytes because they can be more flexible and efficient.
 Those are not the goals of this project.
 
 It has a VGA text mode where it starts reading the contents of memory from a specified address
@@ -15,7 +15,7 @@ It has a VGA text mode where it starts reading the contents of memory from a spe
 translates the encoded colors into ANSI escape codes,
 and prints the output to your terminal.
 
-This repository contains the virtual machine and an assembler to compile programs for it.
+This repository contains the virtual machine, an assembler to compile programs for it, and a debugger for those programs.
 
 ## Instruction Set
 
@@ -63,7 +63,7 @@ This repository contains the virtual machine and an assembler to compile program
 | `4`    | ex    | Extra: holds extra arithmetic output values, used for register expansions (`(value)` syntax)                |
 | `5`    | ac    | Accumulator: holds the output of most arithmetic operations                                                 |
 | `6`    | sp    | Stack pointer: holds the address of the top location in memory of the stack                                 |
-| `7`    | pc    | Program counter: holds the addess of the next instruction in memory to be executed                          |
+| `7`    | pc    | Program counter: holds the address of the next instruction in memory to be executed                         |
 | `8`    | lc    | Last counter: holds the last value of the program counter, useful for loops                                 |
 | `9`    | bi    | Boolean index: set to `0xffff` if the last cmp was equal, else `0xfffe`                                     |
 
@@ -73,8 +73,9 @@ In the directory `sva` you'll find the source code for the assembler.
 
 It reads a rudimentary assembly language and outputs an equally simple binary format called "svb".
 
-See the ["sva" directory](https://github.com/tteeoo/svc/tree/main/sva) for more documentation on writing in the assemby language
-and using the assembler. See the ["asm" directory](https://github.com/tteeoo/svc/tree/main/asm) for some example programs.
+See the ["sva" directory](https://github.com/tteeoo/svc/tree/main/sva) for more documentation on writing in the assembly language and using the assembler.
+See the ["asm" directory](https://github.com/tteeoo/svc/tree/main/asm) for some example programs.
+See the ["svd" directory](https://github.com/tteeoo/svc/tree/main/svd) for using the debugger.
 
 ## To Do
 
