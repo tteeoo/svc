@@ -3,7 +3,6 @@
 package cpu
 
 import (
-	"fmt"
 	"github.com/tteeoo/svc/dat"
 	"github.com/tteeoo/svc/mem"
 	"github.com/tteeoo/svc/vga"
@@ -41,6 +40,7 @@ func NewCPU(m *mem.RAM, v *vga.VGA) *CPU {
 func (c *CPU) Run(address uint16) {
 
 	// Put command-line args into heap
+	var l uint16
 	if len(os.Args) > 2 {
 		i := c.Mem.HeapOffset
 		for _, str := range os.Args[2:] {
@@ -51,11 +51,15 @@ func (c *CPU) Run(address uint16) {
 			c.Mem.Set(i, 0)
 			i++
 		}
+		l = uint16(i - c.Mem.HeapOffset)
 	}
+
+	// Load heap information
+	c.Mem.Set(0xffff, l)
+	c.Mem.Set(0xfffe, c.Mem.HeapOffset)
 
 	// Push exit address onto stack
 	sp := dat.RegNamesToNum["sp"]
-	c.Regs[sp]--
 	c.Mem.Set(c.Regs[sp], 0xffff)
 
 	// Set the program counter
@@ -223,19 +227,14 @@ func (c *CPU) Op(opcode uint16, operands []uint16) {
 		if c.Regs[dat.RegNamesToNum["bi"]] == 0xfffe {
 			c.Regs[dat.RegNamesToNum["pc"]] = c.Regs[operands[0]]
 		}
+	// sth (reg with addr, reg with value)
+	case 0x1e:
+		c.Mem.Set(
+			c.Regs[operands[0]]+c.Mem.HeapOffset,
+			c.Regs[operands[1]],
+		)
+	// ldh (reg to load to, reg with addr)
+	case 0x1f:
+		c.Regs[operands[0]] = c.Mem.Get(c.Regs[operands[1]] + c.Mem.HeapOffset)
 	}
-}
-
-// String returns a string representation of a CPU.
-func (c *CPU) String() string {
-
-	out := "Memory:\n"
-	out += c.Mem.String()
-
-	out += "\nRegisters:"
-	for k, v := range dat.RegNamesToNum {
-		out += fmt.Sprintf("\n%s:%x", k, c.Regs[v])
-	}
-
-	return out
 }

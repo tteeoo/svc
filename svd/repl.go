@@ -56,6 +56,7 @@ func run(c *cpu.CPU) bool {
 func repl(c *cpu.CPU, address uint16) {
 
 	// Put command-line args into heap
+	var l uint16
 	if len(os.Args) > 2 {
 		i := c.Mem.HeapOffset
 		for _, str := range os.Args[2:] {
@@ -67,11 +68,15 @@ func repl(c *cpu.CPU, address uint16) {
 			i++
 		}
 		fmt.Println(color(fmt.Sprintf("argument(s) loaded into heap: %s", os.Args[2:]), "33;1"))
+		l = uint16(i - c.Mem.HeapOffset)
 	}
+
+	// Load heap information
+	c.Mem.Set(0xffff, l)
+	c.Mem.Set(0xfffe, c.Mem.HeapOffset)
 
 	// Push exit address onto stack
 	sp := dat.RegNamesToNum["sp"]
-	c.Regs[sp]--
 	c.Mem.Set(c.Regs[sp], 0xffff)
 	fmt.Println(color("pushed ffff onto stack", "36;1"))
 
@@ -82,10 +87,10 @@ func repl(c *cpu.CPU, address uint16) {
 
 	// Enter the execution loop
 	var cycles int
-	l, _ := readline.New("> ")
+	rl, _ := readline.New("> ")
 	for {
 		// Read input
-		input, err := l.Readline()
+		input, err := rl.Readline()
 		if err != nil {
 			panic(err)
 		}

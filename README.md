@@ -19,38 +19,40 @@ This repository contains the virtual machine, an assembler to compile programs f
 
 ## Instruction Set
 
-| Opcode | Name | Operands                                            | Description                                                                                                                                              |
-| ------ | ---- | --------                                            | -----------                                                                                                                                              |
-| `0x00` | nop  |                                                     | Does nothing                                                                                                                                             |
-| `0x01` | cop  | `register to copy to` `register to copy from`       | Copies the value from one register to another                                                                                                            |
-| `0x02` | cpl  | `register` `value`                                  | Copies a literal value to a register                                                                                                                     |
-| `0x03` | str  | `register holding address` `register holding value` | Stores the value from a register into memory at the address held in another register                                                                     |
-| `0x04` | ldr  | `register to load to` `register holding address`    | Loads the value from memory at the address held in one register into another register                                                                    |
-| `0x05` | add  | `register`                                          | Adds the value held in a register to the accumulator                                                                                                     |
-| `0x06` | sub  | `register`                                          | Subtracts the value held in a register from the accumulator                                                                                              |
-| `0x07` | twc  | `register`                                          | Sets a register to the two's complement of the value it holds                                                                                            |
-| `0x08` | inc  | `register`                                          | Increases the value held in a register by one                                                                                                            |
-| `0x09` | dec  | `register`                                          | Decreases the value held in a register by one                                                                                                            |
-| `0x0A` | mul  | `register`                                          | Multiplies the accumulator with the value held in a register                                                                                             |
-| `0x0B` | div  | `register`                                          | Divides the accumulator by the value held in a register, storing the modulus in the "ex" register                                                        |
-| `0x0C` | dcv  | `register`                                          | Divides the accumulator by the value held in a register, taking into account two's complement negative numbers, storing the modulus in the "ex" register |
-| `0x0D` | xor  | `register`                                          | Performs the "xor" operation on the accumulator with the value held in a register                                                                        |
-| `0x0E` | and  | `register`                                          | Performs the bitwise "and" operation on the accumulator with the value held in a register                                                                |
-| `0x0F` | orr  | `register`                                          | Performs the bitwise "or" operation on the accumulator with the value held in a register                                                                 |
-| `0x10` | not  | `register`                                          | Inverts the value held in a register                                                                                                                     |
-| `0x11` | shr  | `register` `value to shift by`                      | Shifts the value held in a register to the right by a specified value                                                                                    |
-| `0x12` | shl  | `register` `value to shift by`                      | Shifts the value held in a register to the left by a specified value                                                                                     |
-| `0x13` | vga  |                                                     | Prints the VGA text buffer to the screen                                                                                                                 |
-| `0x14` | psh  | `register`                                          | Decreases the stack pointer and sets the top value of the stack to the value held in a register                                                          |
-| `0x15` | pop  | `register`                                          | Stores the top value of the stack in a register and increases the stack pointer                                                                          |
-| `0x16` | ret  |                                                     | Pops the program counter off of the stack                                                                                                                |
-| `0x17` | cal  | `address`                                           | Pushes the program counter onto the stack and sets the program counter to an address                                                                     |
-| `0x18` | cmp  | `register` `register`                               | If the values of two registers are the same, the extra register is set to `0xffff`, else `0xfffe`                                                        |
-| `0x19` | cle  | `address`                                           | Equivalent to "cal", but only executes if the extra register is set to `0xffff`                                                                          |
-| `0x1a` | cln  | `address`                                           | Equivalent to "cal", but only executes if the extra register is set to `0xfffe`                                                                          |
-| `0x1b` | gto  | `register`                                          | Sets the program counter to the value held in a register                                                                                                 |
-| `0x1c` | gte  | `register`                                          | Equivalent to "gto", but only executes if the extra register is set to `0xffff`                                                                          |
-| `0x1d` | gtn  | `register`                                          | Equivalent to "gto", but only executes if the extra register is set to `0xfffe`                                                                          |
+| Opcode | Name | Operands                              | Description                                                                                                                                              |
+| ------ | ---- | --------                              | -----------                                                                                                                                              |
+| `0x00` | nop |                                        | Does nothing                                                                                                                                             |
+| `0x01` | cop | `reg to copy to` `reg to copy from`    | Copies the value from one register to another                                                                                                            |
+| `0x02` | cpl | `reg` `value`                          | Copies a literal value to a register                                                                                                                     |
+| `0x03` | str | `reg holding addr` `reg holding value` | Stores the value from a register into memory at the address held in another register                                                                     |
+| `0x04` | ldr | `reg to load to` `reg holding addr`    | Loads the value from memory at the address held in one register into another register                                                                    |
+| `0x05` | add | `reg`                                  | Adds the value held in a register to the accumulator                                                                                                     |
+| `0x06` | sub | `reg`                                  | Subtracts the value held in a register from the accumulator                                                                                              |
+| `0x07` | twc | `reg`                                  | Sets a register to the two's complement of the value it holds                                                                                            |
+| `0x08` | inc | `reg`                                  | Increases the value held in a register by one                                                                                                            |
+| `0x09` | dec | `reg`                                  | Decreases the value held in a register by one                                                                                                            |
+| `0x0A` | mul | `reg`                                  | Multiplies the accumulator with the value held in a register                                                                                             |
+| `0x0B` | div | `reg`                                  | Divides the accumulator by the value held in a register, storing the modulus in the "ex" register                                                        |
+| `0x0C` | dcv | `reg`                                  | Divides the accumulator by the value held in a register, taking into account two's complement negative numbers, storing the modulus in the "ex" register |
+| `0x0D` | xor | `reg`                                  | Performs the "xor" operation on the accumulator with the value held in a register                                                                        |
+| `0x0E` | and | `reg`                                  | Performs the bitwise "and" operation on the accumulator with the value held in a register                                                                |
+| `0x0F` | orr | `reg`                                  | Performs the bitwise "or" operation on the accumulator with the value held in a register                                                                 |
+| `0x10` | not | `reg`                                  | Inverts the value held in a register                                                                                                                     |
+| `0x11` | shr | `reg` `value to shift by`              | Shifts the value held in a register to the right by a specified value                                                                                    |
+| `0x12` | shl | `reg` `value to shift by`              | Shifts the value held in a register to the left by a specified value                                                                                     |
+| `0x13` | vga |                                        | Prints the VGA text buffer to the screen                                                                                                                 |
+| `0x14` | psh | `reg`                                  | Decreases the stack pointer and sets the top value of the stack to the value held in a register                                                          |
+| `0x15` | pop | `reg`                                  | Stores the top value of the stack in a register and increases the stack pointer                                                                          |
+| `0x16` | ret |                                        | Pops the program counter off of the stack                                                                                                                |
+| `0x17` | cal | `addr`                                 | Pushes the program counter onto the stack and sets the program counter to an address                                                                     |
+| `0x18` | cmp | `reg` `reg`                            | If the values of two registers are the same, the extra register is set to `0xffff`, else `0xfffe`                                                        |
+| `0x19` | cle | `addr`                                 | Equivalent to "cal", but only executes if the extra register is set to `0xffff`                                                                          |
+| `0x1a` | cln | `addr`                                 | Equivalent to "cal", but only executes if the extra register is set to `0xfffe`                                                                          |
+| `0x1b` | gto | `reg`                                  | Sets the program counter to the value held in a register                                                                                                 |
+| `0x1c` | gte | `reg`                                  | Equivalent to "gto", but only executes if the extra register is set to `0xffff`                                                                          |
+| `0x1d` | gtn | `reg`                                  | Equivalent to "gto", but only executes if the extra register is set to `0xfffe`                                                                          |
+| `0x1f` | sth | `reg to load to` `reg holding addr`    | Like "sth", but offsets the address to make it store in the heap section of memory                                                                       |
+| `0x1e` | ldh | `reg holding addr` `reg holding value` | Like "ldh", but offsets the address to make it load from the heap section of memory                                                                      |
 
 ## CPU Registers
 
@@ -81,7 +83,6 @@ See the ["svd" directory](https://github.com/tteeoo/svc/tree/main/svd) for using
 
 * Better tests (ones that actually exist).
 * Keyboard input.
-* Some sort of debugging mode.
 * More example programs and documentation.
 
 ## License
