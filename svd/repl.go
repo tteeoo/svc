@@ -78,7 +78,7 @@ func repl(c *cpu.CPU, address uint16) {
 	// Push exit address onto stack
 	sp := dat.RegNamesToNum["sp"]
 	c.Mem.Set(c.Regs[sp], 0xffff)
-	fmt.Println(color("pushed ffff onto stack", "36;1"))
+	fmt.Println(color("pushed ffff onto the stack", "36;1"))
 
 	// Set the program counter
 	c.Regs[dat.RegNamesToNum["pc"]] = address
@@ -181,7 +181,13 @@ func repl(c *cpu.CPU, address uint16) {
 						fmt.Println("invalid range")
 						continue
 					}
-					for i := start; i < end+1; i++ {
+					if start > end {
+						fmt.Println("invalid range")
+						continue
+					}
+					var newline bool
+					for i := start; i <= end; i++ {
+						newline = false
 						if (i-start)%8 == 0 {
 							fmt.Print(
 								color(
@@ -198,9 +204,15 @@ func repl(c *cpu.CPU, address uint16) {
 						)
 						if (i-start+1)%8 == 0 {
 							fmt.Print("\n")
+							newline = true
+						}
+						if i == 0xffff {
+							break
 						}
 					}
-					fmt.Print("\n")
+					if !newline {
+						fmt.Print("\n")
+					}
 				} else {
 					fmt.Println("invalid command")
 				}
@@ -228,16 +240,17 @@ func repl(c *cpu.CPU, address uint16) {
 			}
 		case "n":
 			fmt.Println(color(fmt.Sprintf("%d", cycles), "34;1"))
-		case "h", "?":
+		case "h", "?", "help":
 			fmt.Println("h      print this help message")
-			fmt.Println("n      print the number of clock cycles executed")
 			fmt.Println("<num>  execute a number of instructions")
+			fmt.Println("n      print the number of instructions that have been executed")
 			fmt.Println("c                print cpu registers")
 			fmt.Println("c <reg> <value>  set cpu register")
 			fmt.Println("m                 print the sections of memory")
 			fmt.Println("m <addr>          print memory address")
 			fmt.Println("m <addr>-<addr>   print range of memory")
 			fmt.Println("m <addr> <value>  set memory address")
+			fmt.Println("press enter with no command to execute a single instruction")
 		default:
 			// Try number
 			if len(command) == 1 {

@@ -1,13 +1,13 @@
 # Simple Virtual Debugger
 
-The debugger for the Simple Virtual Computer.
+A debugger for the Simple Virtual Computer.
 
 Usage:
 ```
 svd <svb file>
 ```
 
-When run, debugger will enter a command-line shell.
+When ran, the debugger will enter a command-line shell.
 
 To view the possible commands for this shell, run `h`.
 
