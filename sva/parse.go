@@ -56,6 +56,8 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 
 	vars := make(map[string]uint16)
 	subs := make(map[string]uint16)
+	labelIndices := make(map[string][][3]int)
+	labelAddresses := make(map[string]uint16)
 	address := c.Mem.ProgramOffset
 	constants := []svb.Constant{}
 	currentSub := svb.Subroutine{}
@@ -72,6 +74,9 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 						splitLine,
 						currentSub.Name,
 					)
+			}
+			if _, exists := vars[splitLine[0]]; exists {
+				return svb.SVB{}, fmt.Errorf("constant \"%s\" defined more than once", splitLine[0])
 			}
 			if len(splitLine[2]) > 2 {
 
@@ -126,11 +131,23 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 			})
 			address++
 
+		} else if len(splitLine) == 1 && len(splitLine[0]) > 1 && splitLine[0][0] == '.' {
+			// Handle label definition
+			name := splitLine[0][1:]
+			if _, exists := labelAddresses[name]; exists {
+				return svb.SVB{}, fmt.Errorf("label \"%s\" defined more than once", name)
+			}
+			if currentSub.Name == "" {
+				return svb.SVB{}, fmt.Errorf("label \"%s\" defined outside of a subroutine", name)
+			}
+			fmt.Println(currentSub.Instructions, address, currentSub.Size())
+			labelAddresses[name] = address + currentSub.Size() - 2
+
 		} else if len(splitLine) == 1 && len(splitLine[0]) > 1 && splitLine[0][len(splitLine[0])-1] == ':' {
 			// Handle subroutine definition
 			name := splitLine[0][:len(splitLine[0])-1]
 			if _, exists := subs[name]; exists {
-				return svb.SVB{}, fmt.Errorf("subroutine \"%s\" already exists", name)
+				return svb.SVB{}, fmt.Errorf("subroutine \"%s\" defined more than once", name)
 			}
 			if currentSub.Name != "" {
 				binary.Subroutines = append(binary.Subroutines, currentSub)
@@ -161,6 +178,16 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 					}
 					operands[i] = val
 
+				} else if (len(j) > 1) && (j[0] == '.') {
+					// Handle label reference
+					name := j[1:]
+					labelIndices[name] = append(labelIndices[name], [3]int{
+						len(binary.Subroutines),
+						len(currentSub.Instructions),
+						i,
+					})
+					operands[i] = 0
+
 				} else if (len(j) > 2) && (j[0] == '[') && (j[len(j)-1] == ']') {
 					// Handle constant reference
 					variable, exists := vars[j[1:len(j)-1]]
@@ -170,7 +197,7 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 					operands[i] = variable
 
 				} else if (len(j) > 2) && (j[0] == '{') && (j[len(j)-1] == '}') {
-					// Handle constant reference
+					// Handle subroutine reference
 					subAddr, exists := subs[j[1:len(j)-1]]
 					if !exists {
 						return svb.SVB{}, fmt.Errorf("subroutine \"%s\" not declared", j[1:len(j)-1])
@@ -229,6 +256,13 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 
 	binary.Subroutines = append(binary.Subroutines, currentSub)
 	binary.Constants = constants
+
+	// Set label addresses
+	for k, v := range labelIndices {
+		for _, ref := range v {
+			binary.Subroutines[ref[0]].Instructions[ref[1]].Operands[ref[2]] = labelAddresses[k]
+		}
+	}
 
 	return binary, nil
 }
