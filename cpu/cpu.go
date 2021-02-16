@@ -83,9 +83,6 @@ func (c *CPU) Run(address uint16) {
 			operands[i] = c.Mem.Get(pc + (1 + i))
 		}
 
-		// Set the lc register
-		c.Regs[dat.RegNamesToNum["lc"]] = pc
-
 		// Increase program counter
 		c.Regs[dat.RegNamesToNum["pc"]] += uint16(1 + size)
 

@@ -37,9 +37,6 @@ func run(c *cpu.CPU) bool {
 		color(fmt.Sprintf("%x", operands), "31;1"),
 	)
 
-	// Set the lc register
-	c.Regs[dat.RegNamesToNum["lc"]] = pc
-
 	// Increase program counter
 	c.Regs[dat.RegNamesToNum["pc"]] += uint16(1 + size)
 
