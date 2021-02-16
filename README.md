@@ -45,12 +45,12 @@ This repository contains the virtual machine, an assembler to compile programs f
 | `0x15` | pop | `reg`                                  | Stores the top value of the stack in a register and increases the stack pointer                                                                          |
 | `0x16` | ret |                                        | Pops the program counter off of the stack                                                                                                                |
 | `0x17` | cal | `addr`                                 | Pushes the program counter onto the stack and sets the program counter to an address                                                                     |
-| `0x18` | cmp | `reg` `reg`                            | If the values of two registers are the same, the extra register is set to `0xffff`, else `0xfffe`                                                        |
-| `0x19` | cle | `addr`                                 | Equivalent to "cal", but only executes if the extra register is set to `0xffff`                                                                          |
-| `0x1a` | cln | `addr`                                 | Equivalent to "cal", but only executes if the extra register is set to `0xfffe`                                                                          |
-| `0x1b` | gto | `reg`                                  | Sets the program counter to the value held in a register                                                                                                 |
-| `0x1c` | gte | `reg`                                  | Equivalent to "gto", but only executes if the extra register is set to `0xffff`                                                                          |
-| `0x1d` | gtn | `reg`                                  | Equivalent to "gto", but only executes if the extra register is set to `0xfffe`                                                                          |
+| `0x18` | cmp | `reg` `reg`                            | If the values of two registers are the same, the boolean index is set to `0xffff`, else `0xfffe`                                                         |
+| `0x19` | cle | `addr`                                 | Equivalent to "cal", but only executes if the boolean index is set to `0xffff`                                                                           |
+| `0x1a` | cln | `addr`                                 | Equivalent to "cal", but only executes if the boolean index is set to `0xfffe`                                                                           |
+| `0x1b` | gto | `addr`                                 | Sets the program counter to an address                                                                                                                   |
+| `0x1c` | gte | `addr`                                 | Equivalent to "gto", but only executes if the boolean index is set to `0xffff`                                                                           |
+| `0x1d` | gtn | `addr`                                 | Equivalent to "gto", but only executes if the boolean index is set to `0xfffe`                                                                           |
 | `0x1f` | sth | `reg to load to` `reg holding addr`    | Like "sth", but offsets the address to make it store in the heap section of memory                                                                       |
 | `0x1e` | ldh | `reg holding addr` `reg holding value` | Like "ldh", but offsets the address to make it load from the heap section of memory                                                                      |
 
@@ -66,8 +66,7 @@ This repository contains the virtual machine, an assembler to compile programs f
 | `5`    | ac    | Accumulator: holds the output of most arithmetic operations                                                 |
 | `6`    | sp    | Stack pointer: holds the address of the top location in memory of the stack                                 |
 | `7`    | pc    | Program counter: holds the address of the next instruction in memory to be executed                         |
-| `8`    | lc    | Last counter: holds the last value of the program counter, useful for loops                                 |
-| `9`    | bi    | Boolean index: set to `0xffff` if the last cmp was equal, else `0xfffe`                                     |
+| `8`    | bi    | Boolean index: set to `0xffff` if the last cmp was equal, else `0xfffe`                                     |
 
 ## The Simple Virtual Assembler
 

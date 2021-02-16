@@ -140,8 +140,8 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 			if currentSub.Name == "" {
 				return svb.SVB{}, fmt.Errorf("label \"%s\" defined outside of a subroutine", name)
 			}
-			fmt.Println(currentSub.Instructions, address, currentSub.Size())
-			labelAddresses[name] = address + currentSub.Size() - 2
+
+			labelAddresses[name] = address + currentSub.Size()
 
 		} else if len(splitLine) == 1 && len(splitLine[0]) > 1 && splitLine[0][len(splitLine[0])-1] == ':' {
 			// Handle subroutine definition
@@ -151,7 +151,7 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 			}
 			if currentSub.Name != "" {
 				binary.Subroutines = append(binary.Subroutines, currentSub)
-				address += currentSub.Size() + 1
+				address += currentSub.Size()
 			}
 
 			subs[name] = address

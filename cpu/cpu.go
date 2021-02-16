@@ -216,16 +216,16 @@ func (c *CPU) Op(opcode uint16, operands []uint16) {
 		}
 	// gto (register holding address to jump to)
 	case 0x1b:
-		c.Regs[dat.RegNamesToNum["pc"]] = c.Regs[operands[0]]
+		c.Regs[dat.RegNamesToNum["pc"]] = operands[0]
 	// gte (register holding address to jump to)
 	case 0x1c:
 		if c.Regs[dat.RegNamesToNum["bi"]] == 0xffff {
-			c.Regs[dat.RegNamesToNum["pc"]] = c.Regs[operands[0]]
+			c.Regs[dat.RegNamesToNum["pc"]] = operands[0]
 		}
 	// gtn (register holding address to jump to)
 	case 0x1d:
 		if c.Regs[dat.RegNamesToNum["bi"]] == 0xfffe {
-			c.Regs[dat.RegNamesToNum["pc"]] = c.Regs[operands[0]]
+			c.Regs[dat.RegNamesToNum["pc"]] = operands[0]
 		}
 	// sth (reg with addr, reg with value)
 	case 0x1e:
