@@ -148,7 +148,7 @@ Subroutines cannot be addressed before they are defined.
 A label is like a subroutine except it can be addressed in code before it is defined, to make a "goto"-like structure.
 
 Here is an example of a subroutine from `asm/lib/io.asm` that uses labels.
-```
+```asm
 ; Prints a string.
 ; aa = Address of the start of the string.
 ; bb = Starting address to print to.
