@@ -225,5 +225,12 @@ func (c *CPU) Op(opcode uint16, operands []uint16) {
 		if c.Regs[dat.RegNamesToNum["bi"]] == 0xfffe {
 			c.Regs[dat.RegNamesToNum["pc"]] = operands[0]
 		}
+	// cml (register, value)
+	case 0x1e:
+		if c.Regs[operands[0]] == operands[1] {
+			c.Regs[dat.RegNamesToNum["bi"]] = 0xffff
+		} else {
+			c.Regs[dat.RegNamesToNum["bi"]] = 0xfffe
+		}
 	}
 }

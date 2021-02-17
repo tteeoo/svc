@@ -5,9 +5,8 @@
 ; aa = Address of the start of the string.
 ; bb = Starting address to print to.
 print:
-
   ; The following code is like a while loop.
-  ; Pseudo-code:
+  ; Pseudocode:
   ; while ((ac = memory[aa]) != 0) {
   ;     memory[bb] = ac | 0x0f00
   ;     aa++
@@ -19,7 +18,7 @@ print:
 
   ; If the value stored at the address in aa is 0x0, skip to the end.
   ldr ac aa
-  cmp ac (0)
+  cml ac 0
   gte &after_print_str
 
   ; Store the loaded character with the applied VGA color codes

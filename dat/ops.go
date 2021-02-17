@@ -33,6 +33,7 @@ var (
 		"gto": 0x1b,
 		"gte": 0x1c,
 		"gtn": 0x1d,
+		"cml": 0x1e,
 	}
 
 	// OpCodeToName is the reverse of OpNameToCode.
@@ -71,5 +72,6 @@ var (
 		"gto": 1,
 		"gte": 1,
 		"gtn": 1,
+		"cml": 2,
 	}
 )
