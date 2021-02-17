@@ -50,6 +50,7 @@ This repository contains the virtual machine, an assembler to compile programs f
 | `0x1b` | gto | `addr`                                 | Sets the program counter to an address                                                                                                                   |
 | `0x1c` | gte | `addr`                                 | Equivalent to "gto", but only executes if the boolean index is set to `0xffff`                                                                           |
 | `0x1d` | gtn | `addr`                                 | Equivalent to "gto", but only executes if the boolean index is set to `0xfffe`                                                                           |
+| `0x1e` | cml | `reg` `value`                          | Equivalent to "cmp", but the second operand is a literal value, not a register                                                                           |
 
 ## CPU Registers
 
