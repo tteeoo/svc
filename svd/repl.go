@@ -69,7 +69,7 @@ func repl(c *cpu.CPU, address uint16) {
 
 		// Load heap information
 		c.Mem.Set(0xfffe, l)
-		c.Mem.Set(0xfffd, uint16(len(os.Args) - 2))
+		c.Mem.Set(0xfffd, uint16(len(os.Args)-2))
 	}
 	c.Mem.Set(0xffff, c.Mem.HeapOffset)
 
