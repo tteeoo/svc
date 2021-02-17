@@ -25,7 +25,7 @@ func parseHex(s string) (uint16, error) {
 }
 
 // parseNum will take a number-representing string and parse it to a
-// two's complement uint16.
+//   two's complement uint16.
 func parseNum(s string) (uint16, error) {
 
 	// Negative number
@@ -70,7 +70,7 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 		if (len(splitLine) == 3) && (splitLine[1] == "=") {
 			if currentSub.Name != "" {
 				return svb.SVB{},
-					fmt.Errorf("you cannot define a constant inside of a subroutine (%s is in %s)",
+					fmt.Errorf("you cannot define a constant inside of a subroutine (\"%s\" is in \"%s\")",
 						splitLine,
 						currentSub.Name,
 					)
@@ -222,7 +222,7 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 			size := dat.OpNameToSize[splitLine[0]]
 			if len(operands) != int(size) {
 				return svb.SVB{},
-					fmt.Errorf("operation %s expected %d operands, but received %d",
+					fmt.Errorf("operation \"%s\" expected %d operands, but received %d",
 						splitLine,
 						size,
 						len(operands),
@@ -231,7 +231,7 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 
 			// Check to make sure instruction is in a defined subroutine
 			if currentSub.Name == "" {
-				return svb.SVB{}, fmt.Errorf("instruction %s used outside of a subroutine", splitLine)
+				return svb.SVB{}, fmt.Errorf("instruction \"%s\" used outside of a subroutine", splitLine)
 			}
 
 			currentSub.Instructions = append(currentSub.Instructions, svb.Instruction{
@@ -244,7 +244,7 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 
 	// Handle main routine
 	if currentSub.Name != "main" {
-		return svb.SVB{}, fmt.Errorf("the last subroutine (%s) is not named main", currentSub.Name)
+		return svb.SVB{}, fmt.Errorf("the last subroutine \"%s\", is not named \"main\"", currentSub.Name)
 	}
 	binary.MainAddress = currentSub.Address
 

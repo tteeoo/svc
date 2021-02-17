@@ -10,8 +10,7 @@ it technically has 128K of memory since each address points to a 16-bit value in
 The reasoning for this is simple: simplicity. Most modern computer systems use bytes because they can be more flexible and efficient.
 Those are not the goals of this project.
 
-It has a VGA text mode where it starts reading the contents of memory from a specified address
-(using a specified resolution, 80x25 by default),
+It has a VGA text mode where it starts reading the contents of memory from a specified address (using an 80x25 resolution)
 translates the encoded colors into ANSI escape codes,
 and prints the output to your terminal.
 
@@ -70,13 +69,11 @@ This repository contains the virtual machine, an assembler to compile programs f
 
 ## The Simple Virtual Assembler
 
-In the directory `sva` you'll find the source code for the assembler.
+It reads a rudimentary assembly language and outputs a binary format called "svb".
 
-It reads a rudimentary assembly language and outputs an equally simple binary format called "svb".
-
-See the ["sva" directory](https://github.com/tteeoo/svc/tree/main/sva) for more documentation on writing in the assembly language and using the assembler.
-See the ["asm" directory](https://github.com/tteeoo/svc/tree/main/asm) for some example programs.
-See the ["svd" directory](https://github.com/tteeoo/svc/tree/main/svd) for using the debugger.
+See the [`sva` directory](https://github.com/tteeoo/svc/tree/main/sva) for more documentation on writing in the assembly language and using the assembler.
+See the [`svd` directory](https://github.com/tteeoo/svc/tree/main/svd) for using the debugger.
+See the [`asm` directory](https://github.com/tteeoo/svc/tree/main/asm) for some example programs.
 
 ## To Do
 
