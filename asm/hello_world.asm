@@ -21,8 +21,5 @@ main:
   ; Call the print subroutine.
   cal {print}
 
-  ; Draw the text buffer.
-  vga
-
-  ; There is a "ret" instruction automatically added after the main subroutine.
-
+  ; Draw the text buffer and exit.
+  vga, ret

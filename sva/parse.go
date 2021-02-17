@@ -131,7 +131,7 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 			})
 			address++
 
-		} else if len(splitLine) == 1 && len(splitLine[0]) > 1 && splitLine[0][0] == '.' {
+		} else if len(splitLine) == 1 && len(splitLine[0]) > 1 && splitLine[0][0] == '&' {
 			// Handle label definition
 			name := splitLine[0][1:]
 			if _, exists := labelAddresses[name]; exists {
@@ -178,7 +178,7 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 					}
 					operands[i] = val
 
-				} else if (len(j) > 1) && (j[0] == '.') {
+				} else if (len(j) > 1) && (j[0] == '&') {
 					// Handle label reference
 					name := j[1:]
 					labelIndices[name] = append(labelIndices[name], [3]int{
@@ -247,12 +247,6 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 		return svb.SVB{}, fmt.Errorf("the last subroutine (%s) is not named main", currentSub.Name)
 	}
 	binary.MainAddress = currentSub.Address
-
-	// Append ret instruction to main
-	currentSub.Instructions = append(currentSub.Instructions, svb.Instruction{
-		Name:   "ret",
-		Opcode: 0x16,
-	})
 
 	binary.Subroutines = append(binary.Subroutines, currentSub)
 	binary.Constants = constants
