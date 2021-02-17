@@ -66,11 +66,12 @@ func repl(c *cpu.CPU, address uint16) {
 		}
 		fmt.Println(color(fmt.Sprintf("argument(s) loaded into heap: %s", os.Args[2:]), "33;1"))
 		l = uint16(i - c.Mem.HeapOffset)
-	}
 
-	// Load heap information
-	c.Mem.Set(0xffff, l)
-	c.Mem.Set(0xfffe, c.Mem.HeapOffset)
+		// Load heap information
+		c.Mem.Set(0xfffe, l)
+		c.Mem.Set(0xfffd, uint16(len(os.Args) - 2))
+	}
+	c.Mem.Set(0xffff, c.Mem.HeapOffset)
 
 	// Push exit address onto stack
 	sp := dat.RegNamesToNum["sp"]

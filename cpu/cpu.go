@@ -52,11 +52,12 @@ func (c *CPU) Run(address uint16) {
 			i++
 		}
 		l = uint16(i - c.Mem.HeapOffset)
-	}
 
-	// Load heap information
-	c.Mem.Set(0xffff, l)
-	c.Mem.Set(0xfffe, c.Mem.HeapOffset)
+		// Load heap information
+		c.Mem.Set(0xfffe, l)
+		c.Mem.Set(0xfffd, uint16(len(os.Args) - 2))
+	}
+	c.Mem.Set(0xffff, c.Mem.HeapOffset)
 
 	// Push exit address onto stack
 	sp := dat.RegNamesToNum["sp"]
@@ -224,14 +225,5 @@ func (c *CPU) Op(opcode uint16, operands []uint16) {
 		if c.Regs[dat.RegNamesToNum["bi"]] == 0xfffe {
 			c.Regs[dat.RegNamesToNum["pc"]] = operands[0]
 		}
-	// sth (reg with addr, reg with value)
-	case 0x1e:
-		c.Mem.Set(
-			c.Regs[operands[0]]+c.Mem.HeapOffset,
-			c.Regs[operands[1]],
-		)
-	// ldh (reg to load to, reg with addr)
-	case 0x1f:
-		c.Regs[operands[0]] = c.Mem.Get(c.Regs[operands[1]] + c.Mem.HeapOffset)
 	}
 }

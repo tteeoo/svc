@@ -33,8 +33,6 @@ var (
 		"gto": 0x1b,
 		"gte": 0x1c,
 		"gtn": 0x1d,
-		"sth": 0x1e,
-		"ldh": 0x1f,
 	}
 
 	// OpCodeToName is the reverse of OpNameToCode.

@@ -4,7 +4,7 @@ The assembler for the Simple Virtual Computer.
 
 It reads a rudimentary assembly language and outputs a file in a binary format called "svb".
 
-How it works is a bit different than a typical x86 assembly language (partial because I don't know any "real" assembly languages very well).
+It works a bit differently than a typical x86 assembly language (partial because I don't know any "real" assembly languages very well).
 
 ## Usage
 

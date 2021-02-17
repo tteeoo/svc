@@ -50,8 +50,6 @@ This repository contains the virtual machine, an assembler to compile programs f
 | `0x1b` | gto | `addr`                                 | Sets the program counter to an address                                                                                                                   |
 | `0x1c` | gte | `addr`                                 | Equivalent to "gto", but only executes if the boolean index is set to `0xffff`                                                                           |
 | `0x1d` | gtn | `addr`                                 | Equivalent to "gto", but only executes if the boolean index is set to `0xfffe`                                                                           |
-| `0x1f` | sth | `reg to load to` `reg holding addr`    | Like "sth", but offsets the address to make it store in the heap section of memory                                                                       |
-| `0x1e` | ldh | `reg holding addr` `reg holding value` | Like "ldh", but offsets the address to make it load from the heap section of memory                                                                      |
 
 ## CPU Registers
 
@@ -75,10 +73,25 @@ See the [`sva` directory](https://github.com/tteeoo/svc/tree/main/sva) for more 
 See the [`svd` directory](https://github.com/tteeoo/svc/tree/main/svd) for using the debugger.
 See the [`asm` directory](https://github.com/tteeoo/svc/tree/main/asm) for some example programs.
 
+## Memory
+
+Sections:
+* VGA text mode: `0x00`-`0x7d0`
+* Stack: `0x7d1`-`0x8ff`
+* Program (varies in size): `0x900`-`0xX`
+* Heap (everything else): `0xX+1`-`0xffff`
+
+Before the CPU starts execution, a few things are done in memory:
+* The value `0xffff` is pushed onto the stack. It will be pulled off with the "main" subroutine's `ret` instruction. When the program counter is set to `0xffff` the virtual machine will stop.
+* The command-line arguments are loaded into the heap. (The heap is just all of the memory that doesn't have a specific purpose.)
+* The word at `0xfffd` is set to the number of command-line arguments.
+* The word at `0xfffe` is set to the size of the command-line arguments (number of characters + null terminators).
+* The word at `0xffff` is set to the address of the start of the heap.
+
 ## To Do
 
 * Better tests (ones that actually exist).
-* Keyboard input.
+* Keyboard input (FIFO queue with halting instruction to fetch a keystroke).
 * More example programs and documentation.
 
 ## License
