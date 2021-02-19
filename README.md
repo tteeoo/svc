@@ -91,9 +91,10 @@ Before the CPU starts execution, a few things are done in memory:
 
 ## To Do
 
+* More example programs and documentation.
 * Better tests (ones that actually exist).
 * Keyboard input (FIFO queue with halting instruction to fetch a keystroke).
-* More example programs and documentation.
+* Virtual drive with simple filesystem.
 
 ## License
 
