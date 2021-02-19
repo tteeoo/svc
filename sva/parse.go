@@ -1,28 +1,13 @@
 package main
 
 import (
-	"encoding/hex"
 	"fmt"
 	"github.com/tteeoo/svc/cpu"
 	"github.com/tteeoo/svc/dat"
 	"github.com/tteeoo/svc/svb"
+	"github.com/tteeoo/svc/util"
 	"strconv"
 )
-
-// parseHex will take a hex-representing string and parse it to a uint16.
-func parseHex(s string) (uint16, error) {
-	// Check the length
-	if len(s) > 4 {
-		return 0, fmt.Errorf("hex value \"%s\" is too large", s)
-	}
-
-	// Pad and decode
-	b, err := hex.DecodeString(fmt.Sprintf("%0*s", 4, s))
-	if err != nil {
-		return 0, fmt.Errorf("cannot decode hex value \"%s\": %s", s, err)
-	}
-	return svb.BytesToUint(b), nil
-}
 
 // parseNum will take a number-representing string and parse it to a
 //   two's complement uint16.
@@ -102,7 +87,7 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 
 				} else if splitLine[2][1] == 'x' {
 					// Handle a hex value
-					val, err := parseHex(splitLine[2][2:])
+					val, err := util.ParseHex(splitLine[2][2:])
 					if err != nil {
 						return svb.SVB{}, err
 					}
@@ -172,7 +157,7 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 			for i, j := range splitLine[1:] {
 				if (len(j) > 2) && (j[1] == 'x') {
 					// Handle hex number
-					val, err := parseHex(j[2:])
+					val, err := util.ParseHex(j[2:])
 					if err != nil {
 						return svb.SVB{}, err
 					}

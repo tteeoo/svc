@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/tteeoo/svc/cpu"
 	"github.com/tteeoo/svc/dat"
+	"github.com/tteeoo/svc/util"
 	"os"
 	"strconv"
 	"strings"
@@ -32,9 +33,9 @@ func run(c *cpu.CPU) bool {
 		operands[i] = c.Mem.Get(pc + (1 + i))
 	}
 	fmt.Println(
-		color(fmt.Sprintf("%x:", pc), "32;1"),
-		color(fmt.Sprintf("%s(%x)", name, op), "31;1"),
-		color(fmt.Sprintf("%x", operands), "31;1"),
+		util.Color(fmt.Sprintf("%x:", pc), "32;1"),
+		util.Color(fmt.Sprintf("%s(%x)", name, op), "31;1"),
+		util.Color(fmt.Sprintf("%x", operands), "31;1"),
 	)
 
 	// Increase program counter
@@ -42,7 +43,7 @@ func run(c *cpu.CPU) bool {
 
 	// Execute instruction
 	if op == dat.OpNameToCode["vga"] {
-		fmt.Println(color("text drawn", "35;1"))
+		fmt.Println(util.Color("text drawn", "35;1"))
 	} else {
 		c.Op(op, operands)
 	}
@@ -64,7 +65,7 @@ func repl(c *cpu.CPU, address uint16) {
 			c.Mem.Set(i, 0)
 			i++
 		}
-		fmt.Println(color(fmt.Sprintf("argument(s) loaded into heap: %s", os.Args[2:]), "33;1"))
+		fmt.Println(util.Color(fmt.Sprintf("argument(s) loaded into heap: %s", os.Args[2:]), "33;1"))
 		l = uint16(i - c.Mem.HeapOffset)
 
 		// Load heap information
@@ -76,11 +77,11 @@ func repl(c *cpu.CPU, address uint16) {
 	// Push exit address onto stack
 	sp := dat.RegNamesToNum["sp"]
 	c.Mem.Set(c.Regs[sp], 0xffff)
-	fmt.Println(color("pushed ffff onto the stack", "36;1"))
+	fmt.Println(util.Color("pushed ffff onto the stack", "36;1"))
 
 	// Set the program counter
 	c.Regs[dat.RegNamesToNum["pc"]] = address
-	fmt.Println(color(fmt.Sprintf("program counter set to %x", address), "32;1"))
+	fmt.Println(util.Color(fmt.Sprintf("program counter set to %x", address), "32;1"))
 	fmt.Println("run `h` for help")
 
 	// Enter the execution loop
@@ -123,8 +124,8 @@ func repl(c *cpu.CPU, address uint16) {
 						ansic = "34;1"
 					}
 					fmt.Println(
-						color(fmt.Sprintf("%s(%x):", k, v), ansic),
-						color(fmt.Sprintf("%x", c.Regs[v]), ansic),
+						util.Color(fmt.Sprintf("%s(%x):", k, v), ansic),
+						util.Color(fmt.Sprintf("%x", c.Regs[v]), ansic),
 					)
 				}
 			} else if len(command) == 3 {
@@ -134,7 +135,7 @@ func repl(c *cpu.CPU, address uint16) {
 					fmt.Println("invalid register")
 					continue
 				}
-				value, err := parseHex(command[2])
+				value, err := util.ParseHex(command[2])
 				if err != nil {
 					fmt.Println("invalid value")
 					continue
@@ -148,33 +149,33 @@ func repl(c *cpu.CPU, address uint16) {
 		case "m":
 			// Print sections
 			if len(command) == 1 {
-				fmt.Println(color(fmt.Sprintf("%s: %x-%x", "text", 0, c.Mem.StackMin-1), "35;1"))
-				fmt.Println(color(fmt.Sprintf("%s: %x-%x", "stak", c.Mem.StackMin, c.Mem.StackMax), "36;1"))
-				fmt.Println(color(fmt.Sprintf("%s: %x-%x, main: %x", "prog", c.Mem.ProgramOffset, c.Mem.HeapOffset-1, address), "32;1"))
-				fmt.Println(color(fmt.Sprintf("%s: %x-%x", "heap", c.Mem.HeapOffset, 0xffff), "33;1"))
+				fmt.Println(util.Color(fmt.Sprintf("%s: %x-%x", "text", 0, c.Mem.StackMin-1), "35;1"))
+				fmt.Println(util.Color(fmt.Sprintf("%s: %x-%x", "stak", c.Mem.StackMin, c.Mem.StackMax), "36;1"))
+				fmt.Println(util.Color(fmt.Sprintf("%s: %x-%x, main: %x", "prog", c.Mem.ProgramOffset, c.Mem.HeapOffset-1, address), "32;1"))
+				fmt.Println(util.Color(fmt.Sprintf("%s: %x-%x", "heap", c.Mem.HeapOffset, 0xffff), "33;1"))
 			} else if len(command) == 2 {
 				// Print memory
 				memRange := strings.Split(command[1], "-")
 				if len(memRange) == 1 {
-					value, err := parseHex(memRange[0])
+					value, err := util.ParseHex(memRange[0])
 					if err != nil {
 						fmt.Println("invalid address")
 						continue
 					}
 					fmt.Println(
-						color(
+						util.Color(
 							fmt.Sprintf("%s: %x", command[1], c.Mem.Get(value)),
-							sectionToColor(addressToSection(c, value)),
+							util.SectionToColor(util.AddressToSection(c, value)),
 						),
 					)
 				} else if len(memRange) == 2 {
 					// Print memory range
-					start, err := parseHex(memRange[0])
+					start, err := util.ParseHex(memRange[0])
 					if err != nil {
 						fmt.Println("invalid range")
 						continue
 					}
-					end, err := parseHex(memRange[1])
+					end, err := util.ParseHex(memRange[1])
 					if err != nil {
 						fmt.Println("invalid range")
 						continue
@@ -188,16 +189,16 @@ func repl(c *cpu.CPU, address uint16) {
 						newline = false
 						if (i-start)%8 == 0 {
 							fmt.Print(
-								color(
+								util.Color(
 									fmt.Sprintf("%0*x: ", 4, i),
-									sectionToColor(addressToSection(c, i)),
+									util.SectionToColor(util.AddressToSection(c, i)),
 								),
 							)
 						}
 						fmt.Print(
-							color(
+							util.Color(
 								fmt.Sprintf("%0*x ", 4, c.Mem.Get(i)),
-								sectionToColor(addressToSection(c, i)),
+								util.SectionToColor(util.AddressToSection(c, i)),
 							),
 						)
 						if (i-start+1)%8 == 0 {
@@ -216,28 +217,28 @@ func repl(c *cpu.CPU, address uint16) {
 				}
 			} else if len(command) == 3 {
 				// Set memory
-				key, err := parseHex(command[1])
+				key, err := util.ParseHex(command[1])
 				if err != nil {
 					fmt.Println("invalid address")
 					continue
 				}
-				value, err := parseHex(command[2])
+				value, err := util.ParseHex(command[2])
 				if err != nil {
 					fmt.Println("invalid value")
 					continue
 				}
 				c.Mem.Set(key, value)
 				fmt.Println(
-					color(
+					util.Color(
 						fmt.Sprintf("set memory address %s to %s", command[1], command[2]),
-						sectionToColor(addressToSection(c, key)),
+						util.SectionToColor(util.AddressToSection(c, key)),
 					),
 				)
 			} else {
 				fmt.Println("invalid command")
 			}
 		case "n":
-			fmt.Println(color(fmt.Sprintf("%d", cycles), "34;1"))
+			fmt.Println(util.Color(fmt.Sprintf("%d", cycles), "34;1"))
 		case "h", "?", "help":
 			fmt.Println("h      print this help message")
 			fmt.Println("<num>  execute a number of instructions")

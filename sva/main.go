@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+
 	// Get input file
 	if len(os.Args) < 2 {
 		fmt.Printf("run like this: %s <input file> [-o <output file>] [-p]\n", os.Args[0])
@@ -69,7 +70,7 @@ func main() {
 
 		err = ioutil.WriteFile(outputFile+".asm", []byte(ppOut), 0644)
 		if err != nil {
-			fmt.Println("error writing binary:", err)
+			fmt.Println("error writing pre-processed asm:", err)
 			os.Exit(1)
 		}
 	}
@@ -80,14 +81,14 @@ func main() {
 	c := cpu.NewCPU(m, v)
 
 	// Parse input
-	svbStruct, err := parse(c, lines)
+	binary, err := parse(c, lines)
 	if err != nil {
 		fmt.Println("error parsing:", err)
 		os.Exit(1)
 	}
 
 	// Write binary
-	err = ioutil.WriteFile(outputFile, svbStruct.Bytes(), 0644)
+	err = ioutil.WriteFile(outputFile, binary.Bytes(), 0644)
 	if err != nil {
 		fmt.Println("error writing binary:", err)
 		os.Exit(1)

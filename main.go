@@ -26,23 +26,19 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Initialize devices
 	m := mem.NewRAM(mem.AddressSpace{}, 80, 25)
 	v := vga.NewVGA(m)
 	c := cpu.NewCPU(m, v)
 
-	// Parse program
-	program, err := svb.ParseBinary(c, b)
-	if err != nil {
-		fmt.Println("error parsing program file:", err)
-		os.Exit(1)
-	}
-
 	// Load program into memory
-	m.Mem = program.GetProgramMem()
+	mainAddress := uint16(0)
+	programSize := uint16(0)
+	m.Mem, mainAddress, programSize = svb.LoadProgram(c, b)
 
 	// Calculate heap offset
-	m.HeapOffset += program.Size()
+	m.HeapOffset += programSize
 
 	// Run!
-	c.Run(program.MainAddress)
+	c.Run(mainAddress)
 }

@@ -30,22 +30,16 @@ func main() {
 	v := vga.NewVGA(m)
 	c := cpu.NewCPU(m, v)
 
-	// Parse program
+	// Load program
 	fmt.Println("simple virtual debugger version alpha")
-	fmt.Printf("parsing file: [%s]... ", os.Args[1])
-	program, err := svb.ParseBinary(c, b)
-	if err != nil {
-		fmt.Println("error parsing program file:", err)
-		os.Exit(1)
-	}
-	fmt.Println("ok")
-
-	// Load program into memory
-	m.Mem = program.GetProgramMem()
+	fmt.Printf("loading file: [%s]\n", os.Args[1])
+	mainAddress := uint16(0)
+	programSize := uint16(0)
+	m.Mem, mainAddress, programSize = svb.LoadProgram(c, b)
 
 	// Calculate heap offset
-	m.HeapOffset += program.Size()
+	m.HeapOffset += programSize
 
 	// Start repl
-	repl(c, program.MainAddress)
+	repl(c, mainAddress)
 }

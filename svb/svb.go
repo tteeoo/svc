@@ -1,5 +1,5 @@
 // Package svb defines interfaces for parsing
-// and creating Simple Virtual Binary format files.
+//   and creating Simple Virtual Binary format files.
 package svb
 
 import (
@@ -41,7 +41,7 @@ func (s Subroutine) Size() uint16 {
 	return size
 }
 
-// SVB represents a Simple Virtual Binary format file.
+// SVB represents a Simple Virtual Binary formatted file.
 type SVB struct {
 	Constants   []Constant
 	Subroutines []Subroutine
