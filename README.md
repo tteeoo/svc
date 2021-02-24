@@ -10,15 +10,14 @@ it technically has 128K of memory since each address points to a 16-bit value in
 The reasoning for this is simple: simplicity. Most modern computer systems use bytes because they can be more flexible and efficient.
 Those are not the goals of this project.
 
-It has a VGA text mode where it starts reading the contents of memory from a specified address (using an 80x25 resolution)
-translates the encoded colors into ANSI escape codes,
-and prints the output to your terminal.
+It implements a "VGA text mode" that reads the contents of memory, using 2,000 contiguous words (which is interpreted as a 80x25 resolution).
+It translates the encoded VGA text colors into ANSI escape codes and prints the colorized ASCII text.
 
 This repository contains the virtual machine, an assembler to compile programs for it, and a debugger for those programs.
 
-In the opcode, `r` represents the number of a CPU register, packed into the word which contains the opcode (to save memory).
-
 ## Instruction Set
+
+In the opcode, `r` represents the number of a CPU register that is packed into the word which contains the opcode to save memory.
 
 | Opcode   | Name  | Operands                               | Description                                                                                                                                              |
 | -------- | ----- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -79,7 +78,7 @@ See the [`asm` directory](https://github.com/tteeoo/svc/tree/main/asm) for some 
 ## Memory
 
 Sections:
-* VGA text mode: `0x00`-`0x7d0`
+* VGA text buffer: `0x00`-`0x7d0`
 * Stack: `0x7d1`-`0x8ff`
 * Program (varies in size): `0x900`-`0xX`
 * Heap (everything else): `0xX+1`-`0xffff`
