@@ -126,7 +126,7 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 				return svb.SVB{}, fmt.Errorf("label \"%s\" defined outside of a subroutine", name)
 			}
 
-			labelAddresses[name] = address + currentSub.Size()
+			labelAddresses[name] = address + uint16(currentSub.Size())
 
 		} else if len(splitLine) == 1 && len(splitLine[0]) > 1 && splitLine[0][len(splitLine[0])-1] == ':' {
 			// Handle subroutine definition
@@ -136,7 +136,7 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 			}
 			if currentSub.Name != "" {
 				binary.Subroutines = append(binary.Subroutines, currentSub)
-				address += currentSub.Size()
+				address += uint16(currentSub.Size())
 			}
 
 			subs[name] = address
@@ -205,7 +205,7 @@ func parse(c *cpu.CPU, lines [][]string) (svb.SVB, error) {
 
 			// Check that the right number of operands are provided
 			size := dat.OpNameToSize[splitLine[0]]
-			if len(operands) != int(size) {
+			if len(operands) != size+dat.OpNameToPacked[splitLine[0]] {
 				return svb.SVB{},
 					fmt.Errorf("operation \"%s\" expected %d operands, but received %d",
 						splitLine,

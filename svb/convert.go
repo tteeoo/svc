@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"github.com/tteeoo/svc/cpu"
+	"github.com/tteeoo/svc/dat"
 	"github.com/tteeoo/svc/mem"
 	"github.com/tteeoo/svc/util"
 )
@@ -56,9 +57,21 @@ func (s SVB) Bytes() []byte {
 	i := uint16(len(s.Constants)) + 2
 	for _, sub := range s.Subroutines {
 		for _, op := range sub.Instructions {
-			u[i] = op.Opcode
+
+			// Pack operands
+			code := (op.Opcode << 8)
+			packed := dat.OpNameToPacked[op.Name]
+			switch packed {
+			case 0:
+				u[i] = code
+			case 1:
+				u[i] = code | op.Operands[0]
+			case 2:
+				u[i] = code | (op.Operands[0] << 4) | op.Operands[1]
+			}
+
 			i++
-			for _, and := range op.Operands {
+			for _, and := range op.Operands[packed:] {
 				u[i] = and
 				i++
 			}

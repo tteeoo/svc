@@ -26,11 +26,11 @@ func run(c *cpu.CPU) bool {
 
 	// Get instruction
 	op := c.Mem.Get(pc)
-	name := dat.OpCodeToName[op]
+	name := dat.OpCodeToName[op>>8]
 	size := dat.OpNameToSize[name]
 	operands := make([]uint16, size)
-	for i := uint16(0); i < size; i++ {
-		operands[i] = c.Mem.Get(pc + (1 + i))
+	for i := 0; i < size; i++ {
+		operands[i] = c.Mem.Get(pc + uint16(1+i))
 	}
 	fmt.Println(
 		util.Color(fmt.Sprintf("%x:", pc), "32;1"),
@@ -42,7 +42,7 @@ func run(c *cpu.CPU) bool {
 	c.Regs[dat.RegNamesToNum["pc"]] += uint16(1 + size)
 
 	// Execute instruction
-	if op == dat.OpNameToCode["vga"] {
+	if (op >> 8) == dat.OpNameToCode["vga"] {
 		fmt.Println(util.Color("text drawn", "35;1"))
 	} else {
 		c.Op(op, operands)

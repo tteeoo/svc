@@ -77,11 +77,11 @@ func (c *CPU) Run(address uint16) {
 
 		// Get instruction
 		op := c.Mem.Get(pc)
-		name := dat.OpCodeToName[op]
+		name := dat.OpCodeToName[op>>8]
 		size := dat.OpNameToSize[name]
 		operands := make([]uint16, size)
-		for i := uint16(0); i < size; i++ {
-			operands[i] = c.Mem.Get(pc + (1 + i))
+		for i := 0; i < size; i++ {
+			operands[i] = c.Mem.Get(pc + uint16(1+i))
 		}
 
 		// Increase program counter
@@ -93,7 +93,25 @@ func (c *CPU) Run(address uint16) {
 }
 
 // Op executes an opcode with the given operands.
-func (c *CPU) Op(opcode uint16, operands []uint16) {
+func (c *CPU) Op(packedOpcode uint16, unpackedOperands []uint16) {
+
+	// Unpack operands
+	opcode := packedOpcode >> 8
+	packed := dat.OpNameToPacked[dat.OpCodeToName[opcode]]
+	numOperands := packed + len(unpackedOperands)
+	operands := make([]uint16, numOperands)
+	switch packed {
+	case 1:
+		operands[0] = (packedOpcode << 12) >> 12
+	case 2:
+		operands[0] = (packedOpcode << 8) >> 12
+		operands[1] = (packedOpcode << 12) >> 12
+	}
+	for i, v := range unpackedOperands {
+		operands[i+int(packed)] = v
+	}
+
+	// Operate
 	switch opcode {
 	// nop
 	case 0x00:

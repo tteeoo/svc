@@ -8,8 +8,8 @@ type AddressSpace map[uint16]uint16
 type RAM struct {
 	Mem           AddressSpace
 	VGAOffset     uint16
-	VGAWidth      uint16
-	VGAHeight     uint16
+	VGAWidth      int
+	VGAHeight     int
 	StackMin      uint16
 	StackMax      uint16
 	ProgramOffset uint16
@@ -17,16 +17,17 @@ type RAM struct {
 }
 
 // NewRAM returns a pointer to a newly initialized RAM.
-func NewRAM(a AddressSpace, vw uint16, vh uint16) *RAM {
+func NewRAM(a AddressSpace, vw int, vh int) *RAM {
+	vgaSize := uint16(vh * vw)
 	return &RAM{
 		Mem:           a,
 		VGAOffset:     0,
 		VGAHeight:     vh,
 		VGAWidth:      vw,
-		StackMin:      (vh * vw) + 1,
-		StackMax:      (vh * vw) + 303,
-		ProgramOffset: (vh * vw) + 304,
-		HeapOffset:    (vh * vw) + 304,
+		StackMin:      vgaSize + 1,
+		StackMax:      vgaSize + 303,
+		ProgramOffset: vgaSize + 304,
+		HeapOffset:    vgaSize + 304,
 	}
 }
 

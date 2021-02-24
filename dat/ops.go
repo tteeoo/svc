@@ -1,7 +1,7 @@
 package dat
 
 var (
-	// OpNameToCode maps names to actual opcodes.
+	// OpNameToCode maps names to opcode prefixes.
 	OpNameToCode = map[string]uint16{
 		"nop": 0x00,
 		"cop": 0x01,
@@ -40,11 +40,11 @@ var (
 	// It is created from it at runtime.
 	OpCodeToName = make(map[uint16]string)
 
-	// OpNameToSize maps names to the instruction size.
-	OpNameToSize = map[string]uint16{
+	// OpNameToPacked maps instruction names to the number of packed operands it had.
+	OpNameToPacked = map[string]int{
 		"nop": 0,
 		"cop": 2,
-		"cpl": 2,
+		"cpl": 1,
 		"str": 2,
 		"ldr": 2,
 		"add": 1,
@@ -59,19 +59,54 @@ var (
 		"and": 1,
 		"orr": 1,
 		"not": 1,
-		"shr": 2,
-		"shl": 2,
+		"shr": 1,
+		"shl": 1,
 		"vga": 0,
 		"psh": 1,
 		"pop": 1,
 		"ret": 0,
-		"cal": 1,
+		"cal": 0,
 		"cmp": 2,
+		"cle": 0,
+		"cln": 0,
+		"gto": 0,
+		"gte": 0,
+		"gtn": 0,
+		"cml": 1,
+	}
+
+	// OpNameToSize maps instruction names to the number of extra operands it had.
+	OpNameToSize = map[string]int{
+		"nop": 0,
+		"cop": 0,
+		"cpl": 1,
+		"str": 0,
+		"ldr": 0,
+		"add": 0,
+		"sub": 0,
+		"twc": 0,
+		"inc": 0,
+		"dec": 0,
+		"mul": 0,
+		"div": 0,
+		"dvc": 0,
+		"xor": 0,
+		"and": 0,
+		"orr": 0,
+		"not": 0,
+		"shr": 1,
+		"shl": 1,
+		"vga": 0,
+		"psh": 0,
+		"pop": 0,
+		"ret": 0,
+		"cal": 1,
+		"cmp": 0,
 		"cle": 1,
 		"cln": 1,
 		"gto": 1,
 		"gte": 1,
 		"gtn": 1,
-		"cml": 2,
+		"cml": 1,
 	}
 )

@@ -21,7 +21,7 @@ type Instruction struct {
 }
 
 // Size calculates the size of an Instruction.
-func (i Instruction) Size() uint16 {
+func (i Instruction) Size() int {
 	return dat.OpNameToSize[i.Name] + 1
 }
 
@@ -33,8 +33,8 @@ type Subroutine struct {
 }
 
 // Size calculates the size of an Subroutine.
-func (s Subroutine) Size() uint16 {
-	size := uint16(0)
+func (s Subroutine) Size() int {
+	size := 0
 	for _, i := range s.Instructions {
 		size += i.Size()
 	}
@@ -49,10 +49,10 @@ type SVB struct {
 }
 
 // Size calculates size of an SVB.
-func (s SVB) Size() uint16 {
-	size := uint16(0)
+func (s SVB) Size() int {
+	size := 0
 	for _, sub := range s.Subroutines {
 		size += sub.Size()
 	}
-	return uint16(len(s.Constants)) + size
+	return len(s.Constants) + size
 }

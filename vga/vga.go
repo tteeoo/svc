@@ -32,8 +32,8 @@ func (v *VGA) TextDraw() {
 	}
 	// Populate
 	a := uint16(0)
-	for i := 0; i < int(v.Mem.VGAHeight); i++ {
-		for j := 0; j < int(v.Mem.VGAWidth); j++ {
+	for i := 0; i < v.Mem.VGAHeight; i++ {
+		for j := 0; j < v.Mem.VGAWidth; j++ {
 			b := v.Mem.Get(a)
 			tb[i][j] = [2]byte{
 				byte(b >> 8),
@@ -152,8 +152,8 @@ func (v *VGA) TextDraw() {
 		line = i + 1
 	}
 	final := ""
-	if int(v.Mem.VGAHeight)-line > 0 {
-		final = fmt.Sprintf("\033[%dB", int(v.Mem.VGAHeight)-line)
+	if v.Mem.VGAHeight-line > 0 {
+		final = fmt.Sprintf("\033[%dB", v.Mem.VGAHeight-line)
 	}
 	print(realOut + final)
 }
