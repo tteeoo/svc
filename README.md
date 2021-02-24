@@ -49,11 +49,11 @@ In the opcode, `r` represents the number of a CPU register that is packed into t
 | `0x1700` | `cal` | `addr`                                 | Pushes the program counter onto the stack and sets the program counter to an address.                                                                     |
 | `0x18rr` | `cmp` | `reg` `reg`                            | If the values of two registers are the same, the boolean index (`bi` register) is set to `0xffff`, else `0xfffe`.                                         |
 | `0x1900` | `cle` | `addr`                                 | Equivalent to `cal`, but only executes if the `bi` register is set to `0xffff`.                                                                           |
-| `0x1a00` | `cln` | `addr`                                 | Equivalent to `cal`, but only executes if the `bi` register is set to `0xfffe`.                                                                           |
-| `0x1b00` | `gto` | `addr`                                 | Sets the program counter to an address.                                                                                                                   |
-| `0x1c00` | `gte` | `addr`                                 | Equivalent to `gto`, but only executes if the `bi` register is set to `0xffff`.                                                                           |
-| `0x1d00` | `gtn` | `addr`                                 | Equivalent to `gto`, but only executes if the `bi` register is set to `0xfffe`.                                                                           |
-| `0x1e0r` | `cml` | `reg` `value`                          | Equivalent to `cmp`, but the second operand is a literal value, not a register.                                                                           |
+| `0x1A00` | `cln` | `addr`                                 | Equivalent to `cal`, but only executes if the `bi` register is set to `0xfffe`.                                                                           |
+| `0x1B00` | `gto` | `addr`                                 | Sets the program counter to an address.                                                                                                                   |
+| `0x1C00` | `gte` | `addr`                                 | Equivalent to `gto`, but only executes if the `bi` register is set to `0xffff`.                                                                           |
+| `0x1D00` | `gtn` | `addr`                                 | Equivalent to `gto`, but only executes if the `bi` register is set to `0xfffe`.                                                                           |
+| `0x1E0r` | `cml` | `reg` `value`                          | Equivalent to `cmp`, but the second operand is a literal value, not a register.                                                                           |
 
 ## CPU Registers
 
