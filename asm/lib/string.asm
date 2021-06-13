@@ -61,3 +61,38 @@ utoa:
   str ra (0)
   pop ra
   ret
+
+; Converts a signed integer to a string.
+; ac = The int.
+; ra = Starting address to write the string to.
+itoa:
+  ; Psuedocode:
+  ; rb = ac
+  ; rb >> 0xe
+  ; if (rb == 1) {
+  ;     memory[ra] = "-";
+  ;     ra++
+  ;     ac = -ac
+  ; }
+  ; utoa()
+  ; ra--
+
+  ; Detect if the number is negative
+  ;   by checking if the first binary digit is 1.
+  cop rb ac
+  shr rb 0xf
+  cml rb 1
+  gtn &after_itoa
+
+  ; If negative, create the minus symbol,
+  ;   then take the two's complement of the number.
+  str ra (0x2d) ; ASCII 0x2d is -
+  inc ra
+  twc ac
+
+  ; Run the utoa function on the number and
+  ;   decrease ra to account for the minus symbol.
+  &after_itoa
+  cal {utoa}
+  dec ra
+  ret
