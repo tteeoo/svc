@@ -15,8 +15,8 @@ main:
   ; Initialize registers aa and bb.
   ; aa holds the address of the character in memory to print.
   ; bb holds the address of where in memory to print to.
-  cpl aa [text]
-  cpl bb 0
+  cpl ra [text]
+  cpl rb 0
 
   ; Call the print subroutine.
   cal {print}

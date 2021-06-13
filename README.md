@@ -57,17 +57,23 @@ In the opcode, `r` represents the number of a CPU register that is packed into t
 
 ## CPU Registers
 
+There are 12 CPU registers, 8 of which are general purpose.
+
 | Number | Alias | Purpose                                                                                                     |
 | ------ | ----- | ----------------------------------------------------------------------------------------------------------- |
-| `0`    | `aa`  | General purpose; used for whatever you desire.                                                              |
-| `1`    | `bb`  | General purpose.                                                                                            |
-| `2`    | `cc`  | General purpose.                                                                                            |
-| `3`    | `dd`  | General purpose.                                                                                            |
-| `4`    | `ex`  | Extra: holds extra arithmetic output values, used for register expansions (`(value)` syntax).               |
-| `5`    | `ac`  | Accumulator: holds the output of most arithmetic operations.                                                |
-| `6`    | `sp`  | Stack pointer: holds the address of the top location in memory of the stack.                                |
-| `7`    | `pc`  | Program counter: holds the address of the next instruction in memory to be executed.                        |
-| `8`    | `bi`  | Boolean index: set to `0xffff` if the last cmp was equal, else `0xfffe`.                                    |
+| `0x0`  | `ra`  | General purpose; used for whatever you desire.                                                              |
+| `0x1`  | `rb`  | General purpose.                                                                                            |
+| `0x2`  | `rc`  | General purpose.                                                                                            |
+| `0x3`  | `rd`  | General purpose.                                                                                            |
+| `0x4`  | `re`  | General purpose.                                                                                            |
+| `0x5`  | `rf`  | General purpose.                                                                                            |
+| `0x6`  | `rg`  | General purpose.                                                                                            |
+| `0x7`  | `rh`  | General purpose.                                                                                            |
+| `0x8`  | `ex`  | Extra: holds extra arithmetic output values, used for register expansions (`(value)` syntax).               |
+| `0x9`  | `ac`  | Accumulator: holds the output of most arithmetic operations.                                                |
+| `0xa`  | `sp`  | Stack pointer: holds the address of the top location in memory of the stack.                                |
+| `0xb`  | `pc`  | Program counter: holds the address of the next instruction in memory to be executed.                        |
+| `0xc`  | `bi`  | Boolean index: set to `0xffff` if the last cmp was equal, else `0xfffe`.                                    |
 
 ## The Simple Virtual Assembler
 

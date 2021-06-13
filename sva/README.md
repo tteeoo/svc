@@ -69,10 +69,10 @@ Operands can be a hex value, positive/negative integer, a register alias (also s
 Examples:
 ```asm
 cpl ac 0xff ; Copies 0xff into the accumulator.
-cpl aa 257  ; Copies 257 into register 0.
-sub aa      ; Subtracts the value held in aa from the accumulator.
-cpl dd -2   ; Copies -2 into register 3.
-cmp ac dd   ; Compares the value of the accumulator and dd.
+cpl ra 257  ; Copies 257 into register 0.
+sub ra      ; Subtracts the value held in ra from the accumulator.
+cpl rd -2   ; Copies -2 into register 3.
+cmp ac rd   ; Compares the value of the accumulator and dd.
 ```
 
 #### Instruction expansions
@@ -82,23 +82,23 @@ There are three different types of them.
 One type maps a single operation to two sets of operands. 
 For example, this code:
 ```asm
-inc aa, bb
+inc ra, rb
 ```
 expands to this:
 ```asm
-inc aa
-inc bb
+inc ra
+inc rb
 ```
 
 Another variant maps two operations to one set of operands.
 This code:
 ```asm
-inc, add aa
+inc, add ra
 ```
 will expand to:
 ```asm
-inc aa
-add aa
+inc ra
+add ra
 ```
 
 The last kind will take a value from inside some parenthesis, copy it into `ex`, and replace the value with "ex", so this code:
@@ -150,31 +150,31 @@ A label is like a subroutine except it can be addressed in code before it is def
 Here is an example of a subroutine from `asm/lib/io.asm` that uses labels.
 ```asm
 ; Prints a string.
-; aa = Address of the start of the string.
-; bb = Starting address to print to.
+; ra = Address of the start of the string.
+; rb = Starting address to print to.
 print:
 
   ; The following code is like a while loop.
   ; Pseudo-code:
-  ; while ((ac = memory[aa]) != 0) {
-  ;     memory[bb] = ac | 0x0f00
-  ;     aa++
-  ;     bb++
+  ; while ((ac = memory[ra]) != 0) {
+  ;     memory[rb] = ac | 0x0f00
+  ;     ra++
+  ;     rb++
   ; }
 
   ; Label the start of the subroutine for looping purposes.
   &loop_print_str
 
-  ; If the value stored at the address in aa is 0x0, skip to the end.
-  ldr ac aa
+  ; If the value stored at the address in ra is 0x0, skip to the end.
+  ldr ac ra
   cmp ac (0)
   gte &after_print_str
 
   ; Store the loaded character with the applied VGA color codes
-  ;   at the address stored in bb, then increase aa and bb by 1.
+  ;   at the address stored in rb, then increase ra and rb by 1.
   orr (0x0f00)
-  str bb ac
-  inc aa, bb
+  str rb ac
+  inc ra, rb
 
   ; Loop back up.
   gto &loop_print_str

@@ -3,61 +3,61 @@
 
 ; Converts an unsigned integer to a string.
 ; ac = The uint.
-; aa = Starting address to write the string to.
+; ra = Starting address to write the string to.
 utoa:
   ; Pseudocode:
-  ; dd = 10
-  ; cc = 0
-  ; stack.push(aa)
+  ; rd = 10
+  ; rc = 0
+  ; stack.push(ra)
   ; do {
-  ;    ac /= dd
+  ;    ac /= rd
   ;    stack.push(ex)
-  ;    cc++
+  ;    rc++
   ; } while (ac != 0)
-  ; while (cc != 0) {
-  ;     bb = stack.pop()
-  ;     ac = bb
-  ;     ac += dd
-  ;     memory[aa] = ac
-  ;     aa++
-  ;     cc--
+  ; while (rc != 0) {
+  ;     rb = stack.pop()
+  ;     ac = rb
+  ;     ac += rd
+  ;     memory[ra] = ac
+  ;     ra++
+  ;     rc--
   ; }
-  ; memory[aa] = 0
-  ; aa = stack.pop()
+  ; memory[ra] = 0
+  ; ra = stack.pop()
 
   ; Initialize registers:
-  ; dd = Divisor.
-  ; cc = Count.
-  ; We push (and later pop) aa because its original value should be preserved.
+  ; rd = Divisor.
+  ; rc = Count.
+  ; We push (and later pop) ra because its original value should be preserved.
   ; (It will likely be used right after this subroutine in printing the string.)
-  cpl dd 10
-  cpl cc 0
-  psh aa
+  cpl rd 10
+  cpl rc 0
+  psh ra
 
   ; Push remainder onto the stack until the result is zero.
   &loop_utoa
-  div dd
+  div rd
   psh ex
-  inc cc
+  inc rc
   cml ac 0
   gtn &loop_utoa
 
-  ; Pull off the stack and store until cc is 0.
+  ; Pull off the stack and store until rc is 0.
   &after_utoa 
-  cpl dd 48
+  cpl rd 48
   &loop2_utoa
-  cml cc 0
+  cml rc 0
   gte &after2_utoa
-  pop bb
-  cop ac bb
-  add dd
-  str aa ac
-  dec cc
-  inc aa
+  pop rb
+  cop ac rb
+  add rd
+  str ra ac
+  dec rc
+  inc ra
   gto &loop2_utoa
   &after2_utoa
 
   ; Add the null terminator.
-  str aa (0)
-  pop aa
+  str ra (0)
+  pop ra
   ret

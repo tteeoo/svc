@@ -1,5 +1,5 @@
 svc
-sva/sva
-svd/svd
+sva
+svd
 *.svb
 *.svb.asm

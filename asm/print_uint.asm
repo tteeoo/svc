@@ -10,12 +10,12 @@ main:
 
   ; We will store the string form of the uint in the heap, so we store
   ;   a pointer to the beginning of the heap in aa.
-  ldr aa (0xffff)
+  ldr ra (0xffff)
 
   ; Convert the uint to a string.
   cal {utoa}
 
   ; Print the string.
-  cpl bb 0
+  cpl rb 0
   cal {print}
   vga, ret
